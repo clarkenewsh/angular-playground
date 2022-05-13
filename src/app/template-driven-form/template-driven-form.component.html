@@ -1,0 +1,23 @@
+<section class="playground-box">
+  <h2>{{title}}</h2>
+
+  <!-- TEMPLATE DRIVEN FORM - INPUT VALUE WITHOUT SUBMIT -->
+  <h3>Reactive Form using input value without form submission button</h3>
+  <input [(ngModel)]="plant" type="text" placeholder="Enter plane name....">
+  <p>Output: {{plant}}</p>
+
+
+  <!-- TEMPLATE DRIVEN FORM  - USING FORM VARIABLE TO CAPTURE FORM STATE ON SUBMIT -->
+  <h3>Reactive Form with Submit</h3>
+  <form #someForm="ngForm" (ngSubmit)="onSubmit()">
+    <input type="text" name="name" [(ngModel)]="animal.name" required placeholder="Enter Animal name...">
+    <input type="text" name="breed" [(ngModel)]="animal.breed" required placeholder="Enter Animal breed...">
+    <button type="submit" class="btn btn-success" [disabled]="!someForm.form.valid">Submit</button>
+  </form>
+
+  <p>Output: {{animal | json}}</p>
+  <p>Validation status: {{someForm.status}}</p>
+</section>
+
+
+

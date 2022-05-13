@@ -1,0 +1,50 @@
+<section class="playground-box">
+  <h2>{{title}}</h2>
+
+<!-- REACTIVE FORM - INPUT VALUE WITHOUT SUBMIT -->
+<h3>Reactive Form using input value without form submission button</h3>
+<input [formControl]="reactiveFormControlInput" type="text" placeholder="reactive input value">
+<p>Output: {{reactiveFormControlInput.value }}</p>
+
+<!-- REACTIVE FORM - FORM GROUP & FORM BUILDER -->
+<h3>Reactive Form using form group & form builder</h3>
+<form [formGroup]="formBuilderGroupForm" (ngSubmit)="onSubmit()" >
+  <div>
+    <input type="text" formControlName="sex" placeholder="Enter sex...">
+  </div>
+  <div>
+    <input type="text" formControlName="day" placeholder="Enter day...">
+  </div>
+  <button type="submit" [disabled]="!formBuilderGroupForm.valid">Submit</button>
+</form>
+
+
+<p>Form Output: {{formBuilderGroupForm.value | json}}</p>
+<p>Validation status: {{formBuilderGroupForm.status}}</p>
+
+<!-- REACTIVE FORM - FORM GROUP  -->
+<h3>Reactive Form using form group only</h3>
+<form [formGroup]="formGroupForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label for="name">Name: </label>
+    <input type="text" id="name" formControlName="name" required placeholder="Enter name...">
+  </div>
+  <div>
+    <label for="name">Address: </label>
+    <input type="text" id="address" formControlName="address" required placeholder="Enter address...">
+  </div>
+  <button type="submit" [disabled]="!formGroupForm.valid">Submit</button>
+</form>
+
+<p>Form Output: {{formGroupForm.value | json}} </p>
+<p>Validation status: {{formGroupForm.status}}</p>
+
+
+<!-- <div *ngIf="formGroupForm.value.name.invalid && (formGroupForm.value.name.dirty || formGroupForm.value.name.touched)">
+  <div *ngIf="formGroupForm.value.name.errors?.required">
+    <p>Name is required</p>
+  </div>
+</div> -->
+
+
+</section>

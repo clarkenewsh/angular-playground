@@ -1,7 +1,7 @@
 <!-- TASK LIST:
 
   1 - Forms 
-      - Reactive Form to update data ([formGroup]="someForm" <input formControlName="name"> (ngSubmit)="onSubmit()" / name = FormControl('') [formControl]="name" / FormBuilder) - suitable for larger, complex forms
+      - Reactive Form to update data ([formGroup]="someForm" <input formControlName="name"> (ngSubmit)="onSubmit() name: new FormControl('')" / name = new FormControl('') [formControl]="name" / FormBuilder) - suitable for larger, complex forms
       - Template Driven Form to update data model - ([ngModel]) to bind form data to model <form #someForm="ngForm" (ngSubmit)="onSubmit()"- suitable for small forms
       - Input, two way data binding (ngModel) - <input ([ngModel])="object.name">
       - Form Validation using both reactive & template driven forms, much like html form validation
@@ -12,7 +12,7 @@
       - Text Interpolation from class properties values
       - Parent/Child components @Input for data binding & @Output for event binding/emitting
       - Structural directives (*ngFor, *ngIf)
-      - Attribute, class & style directives for dynamic styling (NgModel, NgClass, NgStyle). <h1>[ngClass]="isactive ? 'activeClass' : '' "</h1>
+      - Attribute, class & style directives for dynamic styling (NgModel, NgClass, NgStyle). <h1>[ngClass]="isActive ? 'activeClass' : '' "</h1>
       - Template variables using, #name <input (click)="updateName(name.value)">
 
   3 - HTTP Client
@@ -74,4 +74,8 @@
 
 
 <h1>{{title}}</h1>
+
+<app-reactive-forms></app-reactive-forms>
+
+<app-template-driven-form></app-template-driven-form>
 
