@@ -14,45 +14,47 @@
       - Structural directives (*ngFor, *ngIf)
       - Attribute, class & style directives for dynamic styling (NgModel, NgClass, NgStyle). <h1>[ngClass]="isActive ? 'activeClass' : '' "</h1>
       - Template variables using, #name <input (click)="updateName(name.value)">
+      - 
 
   3 - HTTP Client
       - HttpClient service 
       - GET, POST, PUT, DELETE 
-
-        - example get request: 
-
-          http option headers (used for update, add, delete & api key ):
-          httpOptions = {
-            headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-          };
-
-          Service file (responsible for communication with http protocol / backend)
-          getData():Observable {
-            return this.http.get('https://someurl.com')
-            .pipe(catchError (
-              (error) => {
-                console.log(error);
-                return throwError('Error')
-              }
-            ));
-          }
-
-          Component file (responsible for updating class properties & the UI)
-          ngOnInit() {
-            this.dataService.getData().subscribe((res) => {
-              console.log(res);
-            })
-          }
-
+      - Observables & RxJs
       - Observables in service
       - Subscribe in component class
       - Error handling using pipe, tap & catchError in service
       - In Memory Data Service for fake REST API Backend
       - Service methods to speak with backend, component methods to update class properties and UI
+
+            - example get request: 
+
+        http option headers (used for update, add, delete & api key ):
+        httpOptions = {
+          headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+        };
+
+        Service file (responsible for communication with http protocol / backend)
+        getData():Observable {
+          return this.http.get('https://someurl.com')
+          .pipe(catchError (
+            (error) => {
+              console.log(error);
+              return throwError('Error')
+            }
+          ));
+        }
+
+        Component file (responsible for updating class properties & the UI)
+        ngOnInit() {
+          this.dataService.getData().subscribe((res) => {
+            console.log(res);
+          })
+        }
     
   4 - Services & Dependency Injection 
       - Consider use cases for app wide specific services (http, auth, api data)
       - Service methods working with class methods (service methods to speak with backend, component methods to update class properties and UI)
+      - Best Practices
 
   5 - Pipes 
       - currency, async, date, format, json
@@ -62,13 +64,32 @@
       - Dynamic route data using ParamMap(/:id)
       - Child Routes
       - Protected routes using Guards()
+      - Lazy Loading Feature Modules with Routing 
 
-  7 - Animations 
+  7 - NgModules
+      - httpClient Module
+      - Form Module
+      - Feature Modules (large applications)
+      - Feature Module Lazy Loading with Routes
+
+  8 - Observables & RxJS
+
+
+  9 - Animations 
       - ng module for animation library
 
-  8 - Testing 
+  10 - Testing 
       - Unit
       - End-to-end
+
+  11 - Best Practices 
+        - Large scale applications & architecture 
+        - Security
+        - Accessibility 
+        - Lazy Loading Feature Modules
+        - Property Binding Best Practice 
+        - Keeping up to date 
+        
 
 -->
 
