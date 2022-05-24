@@ -93,19 +93,37 @@
           }
 
         ***SOLUTION 2 with custom params (Angular University example)
-        // Call http service upon component initialization
-          ngOnInit() {
+          // Call http service upon component initialization
+            ngOnInit() {
 
-            // Set custom params (first page, first 10 courses)
-            const params = new HttpParams()
-            .set("page", "1")
-            .set("pageSize", "10");
+              // Set custom params (first page, first 10 courses)
+              const params = new HttpParams()
+              .set("page", "1")
+              .set("pageSize", "10");
 
-            this.http.get('/api/courses', {params})
-            .subscribe(
-              courses => this.courses = courses;
-            );
-          }
+              this.http.get('/api/courses', {params})
+              .subscribe(
+                courses => this.courses = courses;
+              );
+            }
+
+           ***SOLUTION 3 - Defining Observable as a variable and use the async pipe to subscribe to observable (best practice) 
+              // Define courses Observable - value returned, array of courses
+              courses$: Observable<Course[]>
+
+              // HTTP Get request using the course Observable variable courses$ : Observable<Course[]>
+              this.courses$ = this.http.get<Course[]>('/api/courses', {params});
+
+              // Take courses Observable and subscribe to it using the async pipe (async pipe will take take of unsubscribing from the Observable when component gets destroyed) -->
+              <!-- <div class="courses" *ngIf="courses$ | async as courses">
+                <course-card *ngFor="let course of courses"
+                            [course]="course">
+
+                  <course-image [src]="course.iconUrl"></course-image>
+
+                </course-card>
+
+              </div> -->
 
 
     
