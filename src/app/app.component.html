@@ -8,31 +8,61 @@
         - Template Driven Form Validation: (<input required>, <input minlength="2">, <input maxlength="10">, <input pattern="[a-z]+"). Validation message like this: <div *ngIf="name.invalid && (name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
         - Reactive Form Validation: someForm = new FormGroup({ name: new FormControl this.nameInput, Validators.required, Validation.minLength(4)}). Validation message like this: <div *ngIf="name.invalid && (name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
 
-  2 - Components
+  2 - Components / core directives
       - Text Interpolation from class properties values
       - Parent/Child components @Input for data binding & @Output for event binding/emitting
-      - Structural directives (*ngFor, *ngIf, elvis operator?, index, ng-template to show error messages, conditional classes)
-      - Attribute, class & style directives for dynamic styling (NgModel, NgClass, NgStyle). <h1>[ngClass]="isActive ? 'activeClass' : '' "</h1>
+      - Structural directives (*ngFor, *ngIf, ngContainer(used when we need a div to conditionally render html structure), *ngSwitchCase elvis operator?, index, ng-template to show error messages, conditional html structure, conditional classes)
+      - Attribute, class & style directives for dynamic styling (NgModel, NgClass, NgStyle, ngSwitch). <h1>[ngClass]="{isActive ? 'activeClass' : '' }"</h1>
+          - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
+            Example: 
+                cardClasses() {
+                  if(this.course.category == 'BEGINNER') {
+                      return 'beginner';
+                    }
+                  }
       - Template variables using, #name <input (click)="updateName(name.value)">
-      
+      - Template Querying: viewChild & viewChildren - get a reference to the component 
+          - @ViewChild(CourseCardComponent) card: CourseCardComponent;
+          - @ViewChild('container') containerDiv: ElementRef; View Child Decorator - get html element reference object
+          - @ViewChild('container', {read: ElementRef}) containerDiv: ElementRef; - View Child Decorator - get html element in relation to the html DOM element (not component)
+      - Lifecycle Hooks
+          - ngAfterViewInit
+          - 
+      - Custom Directives (can create custom directives that can be applied to components as attributes/classes/events/structural directives. Use case is to make re-usable custom directives class, attribute and events that can then be applied throughout to app by adding to components)
+          - Custom Directives stored in 'directives folder'
+          - Apply highlighted directive to className DOM property using @HostBinding (must be a known DOM property)
+          - Apply to DOM attr directly instead of DOM Property
+          - @HostListener is used to interact with native DOM Events i.e mouseover / mouseleave / (use case - create custom events)
+                  - Can also used to emit custom $event 
+          - Custom structural directives
+                  -*ngxUnless (does the opposite to *ngIf) if the value is falsey
+                  - *ngx means custom 
+      - View encapsulation concept is what happens under the hood when we have a css file scoped to an individual component   
+          - :host can be used to app style the the host component 
+          - ::ng-deep used to bypass view encapsulation (use case is to style elements within a component that have used content projection)
+          - :host-context Modifier 
+          - Bypass the feature encapsulation using: ViewEncapsulation.None 
 
   3 - HTTP Client
       - HttpClient service 
       - GET, POST, PUT, DELETE 
+      - Async pipe as a solution to unsubscribe from a http observable (reduce memory leak)
       - Observables & RxJs
       - Observables in service
-      - Subscribe in component class
+      - Subscribe() in component class
       - Error handling using pipe, tap & catchError in service
       - In Memory Data Service for fake REST API Backend
       - Service methods to speak with backend, component methods to update class properties and UI
+      - Async pipe - A better way of passing Observable data to a view
 
-            - example get request: 
+        - Example get request: 
 
         http option headers (used for update, add, delete & api key ):
         httpOptions = {
           headers: new HttpHeaders({ 'Content-Type': 'application/json' })
         };
 
+        ***SOLUTION 1 (Angular docs example with error handling)
         Service file (responsible for communication with http protocol / backend)
         getData():Observable {
           return this.http.get('https://someurl.com')
@@ -50,6 +80,34 @@
             console.log(res);
           })
         }
+
+
+        ***SOLUTION 2 (Angular University example)
+        // Call http service upon component initialization
+          ngOnInit() {
+
+            this.http.get('/api/courses')
+            .subscribe(
+              val => console.log(val);
+            );
+          }
+
+        ***SOLUTION 2 with custom params (Angular University example)
+        // Call http service upon component initialization
+          ngOnInit() {
+
+            // Set custom params (first page, first 10 courses)
+            const params = new HttpParams()
+            .set("page", "1")
+            .set("pageSize", "10");
+
+            this.http.get('/api/courses', {params})
+            .subscribe(
+              courses => this.courses = courses;
+            );
+          }
+
+
     
   4 - Services & Dependency Injection 
       - Consider use cases for app wide specific services (http, auth, api data)
@@ -57,7 +115,7 @@
       - Best Practices
 
   5 - Pipes 
-      - currency, async, date, format, json
+      - currency, number, async, date, text formatting, json, formatting collections of data
  
   6 - Routing
       - Page routing with component
@@ -70,7 +128,7 @@
       - httpClient Module
       - Form Module
       - Feature Modules (large applications)
-      - Feature Module Lazy Loading with Routes
+      - Feature Module Lazy Loading with Rxutes
 
   8 - Observables & RxJS
 
