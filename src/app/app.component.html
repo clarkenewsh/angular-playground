@@ -7,6 +7,7 @@
       - Form Validation using both reactive & template driven forms, much like html form validation
         - Template Driven Form Validation: (<input required>, <input minlength="2">, <input maxlength="10">, <input pattern="[a-z]+"). Validation message like this: <div *ngIf="name.invalid && (name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
         - Reactive Form Validation: someForm = new FormGroup({ name: new FormControl this.nameInput, Validators.required, Validation.minLength(4)}). Validation message like this: <div *ngIf="name.invalid && (name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
+      - (keyup) change detection concept can also be used to actively track changes to the data model and re-render the view up change
 
   2 - Components / core directives
       - Text Interpolation from class properties values
@@ -20,23 +21,184 @@
                       return 'beginner';
                     }
                   }
+
+      - Content Projection
+        - Content projection is about making configurable components. Customize the look and feel by adding extra content  - <ng-content></ng-content>
+        - When content is passed in to a component declaration we can use <ng-content> within the components view to house & display that content
+        - 'Select' can be used inside the <ng-content> to limit what content we would like the <ng-content> to house & display. Element selectors and css selectors can also be used to identify what content to project
+            
+          EXAMPLE of Content Projection:
+
+            ** Component declaration
+              <course-card 
+                [course]="course"
+                (click)="onCourseSelected($event)">
+                <img width="300" alt="angular logo" [src]="course.iconUrl">
+              </courses-card>
+
+            ** CourseCard Component view
+              <div *ngIf="course">
+                <div>
+                  {{course.title}}
+                </div>
+                <ng-content select="img">'Image would be projected here'</ng-content>
+                <p>{{course.description}}</p>
+              </div>
+
+        - @ContentChild('courseImage') image; can be used in the same was a ng-content but gives you a references to just that projected content within.
+              - 'courseImage' is the template variable that we are targeting
+
+      - Angular Templates (ng-template) can be used to provide alternative content block within a components view - For example if no course image show the ng-template content with blank image placeholder
+         - Use template block to display error message if course object image (ng-content) is not available - using 'else', blankImage template variable to place a placeholder image in ng-content block
+        
+          EXAMPLE:
+          ** CourseCardComponent.html
+
+          <div *ngIf="course">
+            <ng-template #blankImage>
+              <p class="warn">{{course.description}} has no image is available</p>
+              <img src="/assets/empty-image.png">
+            </ng-template> 
+
+            <ng-content select="course-image"
+              <*ngIf="course.iconUrl; else blankImage">
+                Course Img here using ng-content using content projection to show course image
+            </ng-content>
+          </div>
+
+        - ngTemplate Instantiation with ngTemplateOutlet can be used to achieve the same as above but makes the ng-template block re-usable.
+          EXAMPLE;
+
+          ** appComponent.html
+          <div class="courses" #container> 
+
+            **Define ng-template with an input context 'let-courseName' (this enables reusability of the ng-template block error message)
+            <ng-template #blankImage let-courseName="description">
+              <p class="warn">{{courseName}} has no image is available</p>
+              <img src="/assets/empty-image.png">
+            </ng-template>
+
+            **Instantiate ng-template using ngTemplateOutlet within ng-container (best practice to instantiate ng-template as an input param directly into the component as done below in course-card component [noImageTpl]="blankImage" '') 
+            **Context variable used to access let-courseName="description" input context
+            <ng-container *ngTemplateOutlet="blankImage; context: {description: course.description}"></ng-container> 
+
+            <course-card *ngFor="let course of courses; 
+              index as i; 
+              first as isFirst; 
+              last as isLast;"
+              [class.is-first]="isFirst" 
+              [class.is-last]="isLast" 
+              (courseSelected)="onCourseSelected($event)" 
+              [course]="course" [cardIndex]="i + 1"
+              [noImageTpl]="blankImage">
+
+              <course-image [src]="course.iconUrl"></course-image>
+            </course-card>
+
+          </div>
+
+        - Templates can also be implemented using component inputs. Best practice to instantiate ng-template as an input param directly into the component as done below in course-card component [noImageTpl]="blankImage"
+          - Instantiate ng-template using ngTemplateOutlet within ng-container (best practice to instantiate ng-template as an input param directly into the component as done below in course-card component [noImageTpl]="blankImage"
+
+          EXAMPLE;
+          **courseCardComponent.ts
+            **Receive noImageTpl template as input variable
+            @Input() noImageTpl: TemplateRef<any>
+          
+          **courseCardComponent.ts
+          <div *ngIf="course">
+
+          	<ng-content select="course-image" *ngIf="course.iconUrl; else noImage">
+	            Course Img here using ng-content using content projection to show course image 
+	          </ng-content>
+
+            **Instantiate template reference that was passed in - noImageTpl 
+              <ng-template #noImage>
+                <ng-container *ngTemplateOutlet="noImageTpl; context:{description:course.description}"></ng-container>
+              </ng-template>
+
+              <div class="course-description">
+                {{course.longDescription}}
+              </div>
+
+          </div>
+
+          ** appComponent.html
+          <div class="courses" #container>
+
+            **Define ng-template with an input context 'let-courseName' (this enables reusability of the ng-template block error message)
+            <ng-template #blankImage let-courseName="description">
+              <p class="warn">{{courseName}} has no image is available</p>
+              <img src="/assets/empty-image.png">
+            </ng-template>
+
+            <course-card *ngFor="let course of courses; 
+              index as i; 
+              first as isFirst; 
+              last as isLast;"
+              [class.is-first]="isFirst" 
+              [class.is-last]="isLast" 
+              (courseSelected)="onCourseSelected($event)" 
+              [course]="course" [cardIndex]="i + 1"
+              [noImageTpl]="blankImage">
+
+              <course-image [src]="course.iconUrl"></course-image>
+
+            </course-card>
+          </div>
+
+
       - Template variables using, #name <input (click)="updateName(name.value)">
       - Template Querying: viewChild & viewChildren - get a reference to the component 
           - @ViewChild(CourseCardComponent) card: CourseCardComponent;
           - @ViewChild('container') containerDiv: ElementRef; View Child Decorator - get html element reference object
           - @ViewChild('container', {read: ElementRef}) containerDiv: ElementRef; - View Child Decorator - get html element in relation to the html DOM element (not component)
-      - Lifecycle Hooks
-          - ngAfterViewInit
-          - 
-      - Custom Directives (can create custom directives that can be applied to components as attributes/classes/events/structural directives. Use case is to make re-usable custom directives class, attribute and events that can then be applied throughout to app by adding to components)
+      
+      - Custom Directives
+          - Custom directives can be applied to components as attributes/classes/events/structural directives. 
+          - They provide custom features that we can use inside of a component to modify behavior, style and structure etc
+          - Use case is to make re-usable custom directives class, attribute and events that can then be applied throughout to app by adding to components
           - Custom Directives stored in 'directives folder'
-          - Apply highlighted directive to className DOM property using @HostBinding (must be a known DOM property)
+          - Examples, see links 
+              - https://github.com/clarkenewsh/angular-core-deep-dive-2-directives/blob/main/src/app/app.component.html
+              - https://github.com/clarkenewsh/angular-core-deep-dive-2-directives/blob/main/src/app/directives/highlighted.directive.ts
+              - https://github.com/clarkenewsh/angular-core-deep-dive-2-directives/blob/main/src/app/directives/ngx-unless.directive.ts
+
+          - @HostBinding can be used to apply directive to DOM elements. Apply highlighted directive to className DOM property using @HostBinding (must be a known DOM property)
           - Apply to DOM attr directly instead of DOM Property
-          - @HostListener is used to interact with native DOM Events i.e mouseover / mouseleave / (use case - create custom events)
-                  - Can also used to emit custom $event 
+          - @HostListener is used to interact with native DOM Events on elements - i.e mouseover / mouseleave / (use case - create custom events)
+              - Can also used to emit custom using '$event' 
+              - EXAMPLE;
+
+                    @Input('highlighted')
+                    isHighLighted = false;
+
+                  **@HostListener is used to interact with native DOM Events i.e mouseover / mouseleave (can also use $event to emit the event)
+                    @Output()
+                    toggleHighlight = new EventEmitter();
+
+                  @HostListener('mouseover', ['$event'])
+                  mouseOver($event) {
+                    console.log($event);
+                    this.isHighLighted = true;
+                    this.toggleHighlight.emit(this.isHighLighted);
+                  }
+
+                  @HostListener('mouseleave')
+                  mouseLeave() {
+                    this.isHighLighted = false;
+                    this.toggleHighlight.emit(this.isHighLighted);
+                  }
+
+                  toggle() {
+                    this.isHighLighted = !this.isHighLighted;
+                    this.toggleHighlight.emit(this.isHighLighted);
+                  } 
+
           - Custom structural directives
                   -*ngxUnless (does the opposite to *ngIf) if the value is falsey
-                  - *ngx means custom 
+                  - '*ngx' means custom directive unlike the usual *ng approach
+
       - View encapsulation concept is what happens under the hood when we have a css file scoped to an individual component   
           - :host can be used to app style the the host component 
           - ::ng-deep used to bypass view encapsulation (use case is to style elements within a component that have used content projection)
@@ -54,8 +216,9 @@
       - In Memory Data Service for fake REST API Backend
       - Service methods to speak with backend, component methods to update class properties and UI
       - Async pipe - A better way of passing Observable data to a view
+      - Using Dependency Injection to provide services to components
 
-        - Example get request: 
+        - Example HTTP GET request: 
 
         http option headers (used for update, add, delete & api key ):
         httpOptions = {
@@ -114,8 +277,8 @@
               // HTTP Get request using the course Observable variable courses$ : Observable<Course[]>
               this.courses$ = this.http.get<Course[]>('/api/courses', {params});
 
-              // Take courses Observable and subscribe to it using the async pipe (async pipe will take take of unsubscribing from the Observable when component gets destroyed) -->
-              <!-- <div class="courses" *ngIf="courses$ | async as courses">
+              // In component - Take courses Observable and subscribe to it using the async pipe (async pipe will take take of unsubscribing from the Observable when component gets destroyed) 
+              <div class="courses" *ngIf="courses$ | async as courses">
                 <course-card *ngFor="let course of courses"
                             [course]="course">
 
@@ -123,48 +286,341 @@
 
                 </course-card>
 
-              </div> -->
+              </div> 
 
 
-    
-  4 - Services & Dependency Injection 
+               ***SOLUTION 4 - Load courses through a coursesService, loadCourses() function and call the function in the onInit() app component. Use async pipe in courses component the same way.
+
+              // Call http service upon component initialization
+              ngOnInit() {
+            
+                console.log(this.coursesService);
+            
+                // Call the loadCourses function using the coursesService
+                this.courses$ = this.coursesService.loadCourses();
+              }
+              
+              ** CourseService
+              loadCourses(): Observable<Course[]> {
+                // Set custom params (first page, first 10 courses)
+                const params = new HttpParams()
+                .set("page", "1")
+                .set("pageSize", "10");
+            
+                // HTTP Get request using the course Observable variable courses$ : Observable<Course[]>
+                return this.http.get<Course[]>('/api/courses', {params});
+              } 
+
+
+              EXAMPLE HTTP PUT REQUEST(top to bottom thread of execution):
+
+              ** CourseCardComponent
+              @Output('courseChanged')
+              courseEmitter = new EventEmitter<Course>();
+
+              // Emit event, create copy of the course using object spread and overwrite the description property
+              onSaveClicked(description:string) {
+                this.courseEmitter.emit({...this.course, description});
+              }
+
+              ** App Component.html
+              <div class="courses" *ngIf="(courses$ | async) as courses">
+                <course-card *ngFor="let course of courses"
+                             [course]="course"
+                             (courseChanged)="save($event)">
+                  <course-image [src]="course.iconUrl"></course-image>
+            
+                </course-card>
+            
+              </div>
+
+              ** App Component.ts
+              // Call courseService saveCourse method & subscribe to the observable
+              save(course:Course) {
+                this.coursesService.saveCourse(course)
+                .subscribe(
+                  () => console.log('Course saved!')
+                );
+              }
+              
+              ** coursesService
+              // Save edited course - HTTP PUT
+              saveCourse(course:Course) {
+            
+                const headers = new HttpHeaders()
+                .set("X-Auth", "userId");
+            
+                // Get course id using $event value input and add course payload data
+                return this.http.put(`/api/courses/${course.id}`, course, {headers});
+              }
+
+
+      4 - Angular Change Detection
+      - Change detection is a concept that angular rebuild a components view when a model get changed. Ie when backend data changes it is rendered to the screen (must like two way data binding with ngModel)
+      - (keyup) is another default change detection event in angular. It checks for changes in the data property model value upon each key stroke in input field (can be expensive as its checking the entire view and component for changes in data properties)
+            - Example below (function and component view);
+            
+            Edit Title: <input #courseTitle [value]="course.description" (keyup)="onTitleChanged(courseTitle.value)">
+          
+            // Change course title on keyup event
+            onTitleChanged(newTitle: string) {
+              this.course.description = newTitle;
+            }
+
+      - Default Change Detection can be expensive (reduce performance) in a large applications when listening to changes to frequently 
+      - OnPush change change detection is more efficient but trickier to use as you cant directly mutate the data directly as its not actively looking for changes in the view. It doesnt actively check changes in the data model that the view is outputting. You must copy the data model using the spread operator and then change the data model properties (much like in react)- implement in @Component ({changeDetection: ChangeDetionStrategy.OnPush})
+          - OnPush change detection will only work with Observable data when using the async pipe. Not using the manual subscribe solution
+          - OnPush is a good option when handling a lot of data as it is better for performance 
+          - OnPush change detection can not mutate the data directly in the view (much like state on react)
+              
+            Example of OnPush Change Detection (without Observable Courses Data Streams);
+
+              @Component({
+                selector: 'course-card',
+                templateUrl: './course-card.component.html',
+                styleUrls: ['./course-card.component.css'],
+                changeDetection: ChangeDetectionStrategy.OnPush
+            })
+
+              // Edit course (without mutating directly so we can use OnPush change detection)
+              onEditCourse() {
+                
+                const course = this.courses[0];
+            
+                // spread over & copy course to change description property
+                const newCourse:any = {...course};
+            
+                newCourse.description = "New Value";
+                console.log(newCourse)
+                this.courses[0].description = newCourse;
+              }
+            
+
+            Example of OnPush Change Detection (with Observable Courses Data Streams);
+              
+              // CourseCardComponent
+              @Component({
+                selector: 'course-card',
+                templateUrl: './course-card.component.html',
+                styleUrls: ['./course-card.component.css'],
+                changeDetection: ChangeDetectionStrategy.OnPush
+            })
+            
+            // App component.ts
+            courses$: Observable<Course[]>
+
+              // App component.html
+            <div class="courses" *ngIf="(courses$ | async) as courses">
+              <course-card *ngFor="let course of courses"
+                          [course]="course"
+                          (courseChanged)="save($event)">
+                <course-image [src]="course.iconUrl"></course-image>
+
+              </course-card>
+            </div>
+
+      - Best practice is to use default change detection where possible 
+      - Custom Change Detection can be implemented to tell angular to looks for changes in particular component (not best practice and should be used only when manually requesting changes i.e every 2seconds when dealing with lots of data continually)
+          - Implemented in constructor and ngOnInit, data subscribe function as below
+          - Best way to implement is with the DoCheck & ngDoCheck() lifecycle hook as per below;
+
+          courses = Course[];
+          loaded:boolean = false;
+
+          constructor(private cd: ChangeDetection){
+          }
+
+          ngDoCheck() {
+            if(this.loaded) {
+              this.cd.markForCheck();
+              this.loaded = undefined;
+            }
+          }
+
+          ngOnInit() {
+            this.coursesService.loadCourses().subscribe(courses => {
+              this.courses = courses;
+            
+              this.loaded = true;
+
+            })
+            
+          }
+
+      - Attribute Decorator can be used when we have lots of inputs passed in to a component that will not require a change in data 
+          - Attribute decorator implemented as below in the component constructor;
+            constructor(@Attribute('type') private type: string)) {
+
+            }
+
+            // Attribute used in component View
+            <component type="beginner">
+
+            </component> -->
+
+  <!-- 5 - Lifecycle Hooks
+       - Constructor() gets called first 
+       - ngOninit() gets called once when the component is first initialized after the constructor
+       - ngOninit() is the fist stage the component gets the @Input member variables i.e course data
+       - ngOnDestroy() gets called when the components gets destroyed. Great way to clean up any resources that the component is using i.e Observable data streams
+       - If using async pipe with Observable, ngOnDestroy() is not needed to unsubscribe from the observable as the async pipe does this automatically.
+       - ngOnChanges() lifecycle hook gets called after constructor and before ngOnInit. When @Input member variables gets updated (not mutated directly). 
+          - If using spread operator to mutate the @Input member variables it does work.
+          - useful is you want to call a callback function when data has changed.
+       - ngAfterContentChecked() Gets called when content of the component gets projected the the UI and checked. @Input data properties can be mutated in this function in some cases.
+       - ngViewChecked() gets called after ngAfterContentChecked. Can't modify @Input data at this point. Main use case is to perform common DOM operations such as scroll to the bottom of a screen after components has finished running through the prior lifecycle methods, focus on DOM element.
+       - ngAfterViewInit() is related to content project
+       - ngAfterViewInit() is related local template querying -->
+
+  <!-- 4 - Services & Dependency Injection 
+      - Dependency Injection allows us to inject a service anywhere win the application
       - Consider use cases for app wide specific services (http, auth, api data)
       - Service methods working with class methods (service methods to speak with backend, component methods to update class properties and UI)
-      - Best Practices
+      - Best Practices.....
+      - Application Service Singleton concepts - when a services is provided at the root of the application and therefore can be used application wide using Dependency Injection
+      - Singleton Dependency Injection enables us to use the concept of 'Tree Shakable Providers' which should be used in most cases unless a specific components has state and we want to inject a service to that s single component and not the 'root' of the app
+      - @Self Decorator can be used to apply a a service for only a single component
+      - @Host Decorator can be used to apply a single instance of of a service to custom directive - Much like the highlighted directive created in the deep dive course -->
 
-  5 - Pipes 
+  <!-- 5 - Pipes 
+      - Angular has built in pipes(below) and custom pipes can also be created 
       - currency, number, async, date, text formatting, json, formatting collections of data
- 
+            
+      EXAMPLE (Built in pipes):
+              
+            <div class="demo">
+              <div>
+                  Date pipe with date output formatting  
+                  Start Date: {{ startDate | date: 'MMM/dd/yyyy' }}
+              </div>
+              <div>
+                  text formatting pipe
+                  {{ title | uppercase }}
+              </div>
+              <div>
+                  Number formatting pipe
+                  {{ price | number: '3.3-5' }}
+              </div>
+              <div>
+                  Currency formatting pipe
+                  {{ price | currency: 'EUR' }}
+              </div>
+              <div>
+                  Currency formatting pipe
+                  {{ rate| percent }}
+              </div> 
+
+              JSON pipe
+              <div>
+                  {{ courses | json }}
+              </div> 
+
+              Key value pair pipe for object data
+              <div *ngFor="let pair of course | keyvalue">
+                  {{pair.key + ': ' + pair.value}}
+              </div>
+            </div> 
+
+      - Custom pipes can be created with file name, within a feature module - filter-by-category.pipe.ts
+      - Custom pipes should also be exported out of a feature module that they are located in
+            - EXAMPLE Custom Pipe;
+
+            ** FilterByCategory.pipe.ts:
+
+            import { Pipe, PipeTransform } from "@angular/core";
+            import { Course } from "../model/course";
+
+            @Pipe({
+              name: 'filterByCategory'
+            })
+            export class FilterByCategory implements PipeTransform {
+
+              transform(courses: Course[], category: string) {
+                return courses.filter(course => course.category === category);
+              }
+            
+            }
+
+            ** App.component.html:
+
+            <div class="courses" *ngIf="(courses$ | async | filterByCategory: 'BEGINNER') as courses">
+              <course-card *ngFor="let course of courses"
+                          [course]="course"
+                          (courseChanged)="save($event)">
+                <course-image [src]="course.iconUrl"></course-image>
+
+              </course-card>
+            </div>
+
+      - Pure pipes can be used in an instance were a course category data may change although with the above custom pipe it will not be filtered from the UI
+      - Angular does not trigger a pure pipe to re run on every change detection cycle as it can be expensive (pure pipes are best practice)
+      - Impure pipes can be used were we want the pipe to be called in every change detection cycle (can be expensive so best practice is to use pure pipes)
+          - Impure pipe implementation
+            EXAMPLE:
+
+            ** FilterByCategory.pipe.ts:
+            @Pipe({
+              name: 'filterByCategory',
+              pure: false
+            })
+   
   6 - Routing
       - Page routing with component
       - Dynamic route data using ParamMap(/:id)
       - Child Routes
       - Protected routes using Guards()
-      - Lazy Loading Feature Modules with Routing 
+      - Lazy Loading Feature Modules with Routing
+      - routerLink="/courses" is used on <a> tag links to link to a route 
 
-  7 - NgModules
-      - httpClient Module
-      - Form Module
-      - Feature Modules (large applications)
-      - Feature Module Lazy Loading with Rxutes
+  7 - Modules / NgModules
+      - App.module.ts is the root module
+            - Declarations: (components, directives)
+            - Imports: (BrowserModule, HttpClient, BrowserAnimationsModule, feature modules )
+            - Providers: (Services)
+            - bootstrap: (AppComponent)
+      - Pipes can be applied to module
+      - Feature Modules can be create with ng generate module courses to group tightly related components, services, directives & pipes (large applications)
+          - The course module is an example that would include all the course related components, services, directives & pipes
+          - Feature modules can include components, services, directives, pipes 
+          - All feature modules must include CommonModule
+          - Feature modules must have exports to allow the root module to understand that we want to use this modules components: [CourseCardComponent, CourseImageComponent]
+          - ** Remember to refactor all the necessary imports, declarations etc when refactoring a feature module
+      - Feature Module Lazy Loading with Routes
 
-  8 - Observables & RxJS
+  8 - Angular Internationalization
+        - Enables us to make the app multi language 
+        - i18n can be places on a element as a custom attribute to implement internationalization then run 'ng xi18n' in terminal which will create a message.xlf file
+          - Example: <button (click)="onEditCourse()" i18n>Edit Course</button>
+        - The the message.xlf file an 'id' is generated for the element we market with 'i18n' and is passed through translator 
+        - i18n-"welcome" can be used giving the translation context in cases were a words are interpreted different in other languages - this is passed to the translator to help it translate the element
+        - i18n also supports pluralization support - can use a member variable to do so - i.e courseTotal = 18
+        - i18n also supports Expression support
+        - ng xi18n --i18n-locale fr in the terminal to change the language in the message.xlf file 
+        - Locale will be a folder in the app to house all of the translated files
+
+  9 - Angular Elements
+      - Angular elements are used in in circumstances for example a CMS were the user wants to create their own content within the application
+
+  10 - Observables & RxJS Library
+      - RxJS is a library for composing asynchronous and event-based programs by using observable sequences.
+  
+  11 - Reactive Angular In Practice
 
 
-  9 - Animations 
+  12 - Animations 
       - ng module for animation library
 
-  10 - Testing 
+  13 - Testing 
       - Unit
       - End-to-end
 
-  11 - Best Practices 
-        - Large scale applications & architecture 
-        - Security
-        - Accessibility 
-        - Lazy Loading Feature Modules
-        - Property Binding Best Practice 
-        - Keeping up to date 
+  14 - Best Practices 
+      - Large scale applications & architecture 
+      - Security
+      - Accessibility 
+      - Lazy Loading Feature Modules
+      - Property Binding Best Practice 
+      - Keeping up to date 
         
 
 -->
