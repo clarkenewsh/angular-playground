@@ -95,8 +95,10 @@
 
         - index as i
         - ng-container (this is how angular works under the hood when using *ngIf/*ngFor)
+        - ng-container can be used instead of a div to apply conditional structural rendering (dont apply a div just to apply conditional rendering. ng-container should be used in this situation)
         - ng-template to show error messages or replace course image, conditional html structure,
         - Conditional style classes using [ngClass]
+
       - Attribute, class & style directives for dynamic styling ([src], [title], [course], ngModel, ngClass, ngStyle, ngSwitch). <h1>[ngClass]="{isActive ? 'activeClass' : '' }"</h1>
           - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (best practice & keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
             
@@ -121,6 +123,12 @@
                   'text-decoration': 'underline'
                 }
               }
+              
+      - Template Querying: viewChild & viewChildren - get a reference to the component 
+        - @ViewChild(CourseCardComponent) card: CourseCardComponent;
+        - @ViewChild('container') containerDiv: ElementRef; View Child Decorator - get html element reference object
+        - @ViewChild('container', {read: ElementRef}) containerDiv: ElementRef; - View Child Decorator - get html element in relation to the html DOM element (not component)
+    
 
       - Content Projection
         - Content projection is about making configurable components. Customize the look and feel by adding extra content to a component using - <ng-content></ng-content>
@@ -246,11 +254,6 @@
 
       - Template variables using, #name <input (click)="updateName(name.value)">
 
-      - Template Querying: viewChild & viewChildren - get a reference to the component 
-          - @ViewChild(CourseCardComponent) card: CourseCardComponent;
-          - @ViewChild('container') containerDiv: ElementRef; View Child Decorator - get html element reference object
-          - @ViewChild('container', {read: ElementRef}) containerDiv: ElementRef; - View Child Decorator - get html element in relation to the html DOM element (not component)
-      
       - Custom Directives
           - Custom directives can be applied to components as attributes/classes/events/structural directives. 
           - They provide custom features that we can use inside of a component to modify behavior, style and structure etc
