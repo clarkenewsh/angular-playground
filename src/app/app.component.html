@@ -6,25 +6,125 @@
       - Input, two way data binding (ngModel) - <input ([ngModel])="object.name">
       - Form Validation using both reactive & template driven forms, much like html form validation
         - Template Driven Form Validation: (<input required>, <input minlength="2">, <input maxlength="10">, <input pattern="[a-z]+"). Validation message like this: <div *ngIf="name.invalid && (name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
-        - Reactive Form Validation: someForm = new FormGroup({ name: new FormControl this.nameInput, Validators.required, Validation.minLength(4)}). Validation message like this: <div *ngIf="name.invalid && (name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
+        - Reactive Form Validation: someForm = new FormGroup({ name: new FormControl this.nameInput, Validators.required, Validation.minLength(4)}). Validation message like this: <div *ngIf="name.invalid && name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
       - (keyup) change detection concept can also be used to actively track changes to the data model and re-render the view up change
 
   2 - Components / core directives
       - Text Interpolation from class properties values
-      - Parent/Child components @Input for data binding & @Output for event binding/emitting
-      - Structural directives (*ngFor, *ngIf, ngContainer(used when we need a div to conditionally render html structure), *ngSwitchCase elvis operator?, index, ng-template to show error messages, conditional html structure, conditional classes)
-      - Attribute, class & style directives for dynamic styling (NgModel, NgClass, NgStyle, ngSwitch). <h1>[ngClass]="{isActive ? 'activeClass' : '' }"</h1>
-          - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
-            Example: 
+      - Parent/Child components
+        - @Input for data binding from parent to child component - define property in parent in, pass in to component declaration with attribute binding [course]=[course] and @Input inside child component ts file (use the interface type to declare in child component to make type safe) i.e @Input course: Course;
+        - @Output new EventEmitter for event binding/emitting
+          - Native click events can be bubbled up from child to parent without using @Output, just need (click) in the component declaration
+          - Custom events will need the @Output EventEmitter to bubble up -  define method in the parent component, name the event in the @Output in the child component ts file with typescript defined what it getting outputted, $event can be caught in the component declaration and then caught in the parent component as params as we used the $event & EventMiter
+              - Example of custom events:
+
+              ** App Component.ts 
+                **catch course payload as course param using the $event and Event emitter 
+                onCourseSelected(course:Course) {
+                  console.log("app comp - click event bubbled", course);
+                }
+
+              ** App Component.html
+                **Catch course object payload using the $event emitter, pass the payload to the courseSelected() custom event. *Custom event is named the same as the @Output EventEmitter
+                <course-card *ngFor="let course of courses; 
+                    index as i; 
+                    first as isFirst; 
+                    last as isLast;"
+                    [class.is-first]="isFirst" 
+                    [class.is-last]="isLast" 
+                    (courseSelected)="onCourseSelected($event)" 
+                    [course]="course" [cardIndex]="i + 1"
+                    [noImageTpl]="blankImage">
+
+                    <course-image [src]="course.iconUrl"></course-image>
+                </course-card>
+
+              ** Child Component.ts
+                @Output() courseSelected = new EventEmitter<Course>();
+                  
+                onCourseViewed() {
+                  console.log("card comp - button clicked")
+                  this.courseSelected.emit(this.course);
+                }
+
+              ** Child Component.html
+                <button (click)="onCourseViewed()">View Course</button>
+
+
+      - Structural directives 
+        - *ngFor, *ngIf, ngContainer (used when we need a div to conditionally render html structure), *ngSwitchCase elvis operator?
+          - *ngIf can be used in multiple ways - boolean expression on object (entire object is best practice as it will bypass the undefined object and still show the remaining course objects) or individual object property, custom function calls etc
+          - *ngIf with 'else' can be used to display an error message were else is a ng-template with template variable using #templateVaribleName
+                - Example:
+
+                  <ng-content select="course-image" *ngIf="course.iconUrl; else noImage">
+                    Course Img here using ng-content using content projection to show course image 
+                  </ng-content>
+
+                  **Instantiate template reference 
+                  <ng-template #noImage>
+                    <p class="warn">{{course.description}} has no image is available</p>
+                  </ng-template>
+  
+          - elvis operator? can be used to bypass an undefined object value or object property so that the rest of the course are still displayed
+          - *ngSwitch can be used when we want to conditionally render more than two outcomes 
+                  Example ngSwitch:
+                  **[ngSwitch] attr & *ngSwitchCase / *ngSwitchDefault structural directive, used to show course level 
+                    <ng-container [ngSwitch]="course.category">
+                      <div class="course-category">
+                      <ng-container *ngSwitchCase="'BEGINNER'">
+                        <div class="category" >
+                        Beginner
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="'INTERMEDIATE'">
+                        <div class="category" >
+                        Intermediate
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="'ADVANCED'">
+                        <div class="category" >
+                        Advanced
+                        </div>
+                      </ng-container>
+                      <div class="category" *ngSwitchDefault>
+                        All Levels
+                      </div>
+                      </div>
+                    </ng-container>
+
+        - index as i
+        - ng-container (this is how angular works under the hood when using *ngIf/*ngFor)
+        - ng-template to show error messages or replace course image, conditional html structure,
+        - Conditional style classes using [ngClass]
+      - Attribute, class & style directives for dynamic styling ([src], [title], [course], ngModel, ngClass, ngStyle, ngSwitch). <h1>[ngClass]="{isActive ? 'activeClass' : '' }"</h1>
+          - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (best practice & keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
+            
+            Example conditional class: 
+                <div [ngClass]="cardClasses()></div>
+
+                ** add conditional styling to class - beginner courses true, apply 'beginner' class
                 cardClasses() {
                   if(this.course.category == 'BEGINNER') {
-                      return 'beginner';
-                    }
+                    return 'beginner';
                   }
+                }
+
+            Example conditional style: 
+            	<div class="course-title" [ngStyle]="cardStyles()">
+                {{cardIndex + ' ' + course.description}}
+              </div>
+
+              ** add conditional style to element
+              cardStyles() {
+                return {
+                  'text-decoration': 'underline'
+                }
+              }
 
       - Content Projection
-        - Content projection is about making configurable components. Customize the look and feel by adding extra content  - <ng-content></ng-content>
-        - When content is passed in to a component declaration we can use <ng-content> within the components view to house & display that content
+        - Content projection is about making configurable components. Customize the look and feel by adding extra content to a component using - <ng-content></ng-content>
+        - When content is passed in to a component declaration, we can use <ng-content> within the components view to house & display that content
         - 'Select' can be used inside the <ng-content> to limit what content we would like the <ng-content> to house & display. Element selectors and css selectors can also be used to identify what content to project
             
           EXAMPLE of Content Projection:
@@ -50,7 +150,6 @@
 
       - Angular Templates (ng-template) can be used to provide alternative content block within a components view - For example if no course image show the ng-template content with blank image placeholder
          - Use template block to display error message if course object image (ng-content) is not available - using 'else', blankImage template variable to place a placeholder image in ng-content block
-        
           EXAMPLE:
           ** CourseCardComponent.html
 
@@ -68,7 +167,6 @@
 
         - ngTemplate Instantiation with ngTemplateOutlet can be used to achieve the same as above but makes the ng-template block re-usable.
           EXAMPLE;
-
           ** appComponent.html
           <div class="courses" #container> 
 
@@ -99,7 +197,6 @@
 
         - Templates can also be implemented using component inputs. Best practice to instantiate ng-template as an input param directly into the component as done below in course-card component [noImageTpl]="blankImage"
           - Instantiate ng-template using ngTemplateOutlet within ng-container (best practice to instantiate ng-template as an input param directly into the component as done below in course-card component [noImageTpl]="blankImage"
-
           EXAMPLE;
           **courseCardComponent.ts
             **Receive noImageTpl template as input variable
@@ -147,8 +244,8 @@
             </course-card>
           </div>
 
-
       - Template variables using, #name <input (click)="updateName(name.value)">
+
       - Template Querying: viewChild & viewChildren - get a reference to the component 
           - @ViewChild(CourseCardComponent) card: CourseCardComponent;
           - @ViewChild('container') containerDiv: ElementRef; View Child Decorator - get html element reference object
