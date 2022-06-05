@@ -123,7 +123,7 @@
                   'text-decoration': 'underline'
                 }
               }
-              
+
       - Template Querying: viewChild & viewChildren - get a reference to the component 
         - @ViewChild(CourseCardComponent) card: CourseCardComponent;
         - @ViewChild('container') containerDiv: ElementRef; View Child Decorator - get html element reference object
@@ -453,6 +453,92 @@
                 // Get course id using $event value input and add course payload data
                 return this.http.put(`/api/courses/${course.id}`, course, {headers});
               }
+
+          *** ANGULAR UNIVERSITY CRUD SOLUTIONs -  USING RxJS
+
+              **GET REQUEST:
+
+              @Component({
+              selector: 'app-root',
+              template: `
+                  <ul *ngIf="courses$ | async as courses else noData">
+                      <li *ngFor="let course of courses">
+                          {{course.description}}
+                      </li> 
+                  </ul>
+                  <ng-template #noData>No Data Available</ng-template>
+              `})
+
+              export class AppComponent implements OnInit {
+                  courses$: Observable<Course[]>;
+
+                  constructor(private http:HttpClient) {
+                  }
+
+                  ngOnInit() {
+                      this.courses$ = this.http
+                          .get<Course[]>("/courses.json")
+                          .map(data => _.values(data))
+                          .do(console.log);
+                  }
+              }
+
+
+              **GET REQUEST USING WITH PARAMS:
+
+              import {HttpParams} from "@angular/common/http";
+
+              const params = new HttpParams()
+                  .set('orderBy', '"$key"')
+                  .set('limitToFirst', "1");
+
+              this.courses$ = this.http
+                  .get("/courses.json", {params})
+                  .do(console.log)
+                  .map(data => _.values(data))
+
+
+
+            **GET REQUEST USING USING 'REQUEST' API:
+
+            @Component({
+              selector: 'app-root',
+              template: `
+                  <ul *ngIf="courses$ | async as courses else noData">
+                      <li *ngFor="let course of courses">
+                          {{course.description}}
+                      </li> 
+                  </ul>
+                  <ng-template #noData>No Data Available</ng-template>
+            `})
+
+            export class AppComponent implements OnInit {
+                courses$: Observable<Course[]>;
+
+                constructor(private http:HttpClient) {
+                }
+
+                ngOnInit() {
+                  this.courses$ = this.http
+                    .request(
+                        "GET",
+                        "/courses.json", 
+                        {
+                            responseType:"json",
+                            params
+                        })
+                    .do(console.log)
+                    .map(data => _.values(data));
+                }
+            }
+
+            **PUT REQUEST:
+            
+
+
+
+            
+
 
 
       4 - Angular Change Detection
