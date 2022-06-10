@@ -267,37 +267,109 @@
           - @HostBinding can be used to apply directive to DOM elements. Apply highlighted directive to className DOM property using @HostBinding (must be a known DOM property)
           - Apply to DOM attr directly instead of DOM Property
           - @HostListener is used to interact with native DOM Events on elements - i.e mouseover / mouseleave / (use case - create custom events)
-              - Can also used to emit custom using '$event' 
+              - Can also used to emit custom using '$event' .
+
               - EXAMPLE;
+              ** app.component.html
+              Custom structural directive - *ngxUnless (does the opposite to *ngIf) if the value is falsey 
+               Custom structural directives can be implemented as below 
+              <ng-template [ngIf]="courses[0]" let-course>
+                <div class="courses salmon-theme">
 
-                    @Input('highlighted')
-                    isHighLighted = false;
+                  Custom attribute directive created 'highlighted' and applied as host element to the course-card component -->
+                  <!-- Custom event directives can also be created (toggleHighlighted)="onToggle($event)-->
+                  <!-- Can export a custom directive using template variable and #highlighter="hl" and assign it the expression as hl (exportAs: 'hl' saved in directives.ts file). Can then be used as so <div class="course-description" (dblclick)="highlighter.toggle()">  -->
+                  <!-- Custom structural directive - *ngxUnless (does the opposite to *ngIf) if the value is falsey 
 
-                  **@HostListener is used to interact with native DOM Events i.e mouseover / mouseleave (can also use $event to emit the event)
-                    @Output()
-                    toggleHighlight = new EventEmitter();
+                  <course-card highlighted #highlighter="hl"
+                    (toggleHighlight)="onToggle($event)"
+                    (courseSelected)="onCourseSelected($event)"
+                    [course]="course">
+                    
+                    
+                    *ngx-unless used as a custom structural directive to always show the course image, unless the iconUrl property is falsey (logic in the ngx-unless structural directive file)
+                    <course-image 
+                      [src]="course.iconUrl" 
+                      *ngxUnless="!course.iconUrl">
+                    </course-image>
 
-                  @HostListener('mouseover', ['$event'])
-                  mouseOver($event) {
-                    console.log($event);
-                    this.isHighLighted = true;
-                    this.toggleHighlight.emit(this.isHighLighted);
-                  }
+                    <div class="course-description" 
+                      (dblclick)="highlighter.toggle()">
+                      {{ course.longDescription }}
+                    </div>
 
-                  @HostListener('mouseleave')
-                  mouseLeave() {
-                    this.isHighLighted = false;
-                    this.toggleHighlight.emit(this.isHighLighted);
-                  }
+                  </course-card>
 
-                  toggle() {
-                    this.isHighLighted = !this.isHighLighted;
-                    this.toggleHighlight.emit(this.isHighLighted);
-                  } 
+              </div>
+              </ng-template>
 
+
+
+              ** highlighted.directive.ts file
+              @Input('highlighted')
+              isHighLighted = false;
+
+            **@HostListener is used to interact with native DOM Events i.e mouseover / mouseleave (can also use $event to emit the event)
+              @Output()
+              toggleHighlight = new EventEmitter();
+
+            @HostListener('mouseover', ['$event'])
+            mouseOver($event) {
+              console.log($event);
+              this.isHighLighted = true;
+              this.toggleHighlight.emit(this.isHighLighted);
+            }
+
+            @HostListener('mouseleave')
+            mouseLeave() {
+              this.isHighLighted = false;
+              this.toggleHighlight.emit(this.isHighLighted);
+            }
+
+            toggle() {
+              this.isHighLighted = !this.isHighLighted;
+              this.toggleHighlight.emit(this.isHighLighted);
+            } 
+
+
+            
           - Custom structural directives
                   -*ngxUnless (does the opposite to *ngIf) if the value is falsey
                   - '*ngx' means custom directive unlike the usual *ng approach
+
+            Example: 
+            **ngx-unless.directive.ts file
+            import { Directive, EmbeddedViewRef, TemplateRef, ViewContainerRef, Input } from '@angular/core';
+
+            @Directive({
+              selector: '[ngxUnless]'
+            })
+            export class NgxUnlessDirective {
+
+              visible = false;
+
+              // Inject custom directive template
+              constructor(
+                private templateRef: TemplateRef<any>,
+                private viewContainer: ViewContainerRef
+              ) { }
+
+              //  If condition false, instantiate template using EmbeddedViewRef & template 
+                  // else remove ng-template from the ui
+                    // visible conditional used if visible flag is set to false (use case: if already rendered to ui stop it duplicating ng-template)
+              @Input()
+              set ngxUnless(condition: boolean) {
+                if(!condition && !this.visible) {
+                  this.viewContainer.createEmbeddedView(this.templateRef);
+                  this.visible = true;
+                }
+                else if(condition && this.visible) {;
+                  this.viewContainer.clear()
+                  this.visible = false;
+                }
+              }
+
+            }
 
       - View encapsulation concept is what happens under the hood when we have a css file scoped to an individual component   
           - :host can be used to app style the the host component 
@@ -533,7 +605,7 @@
             }
 
             **PUT REQUEST:
-            
+
 
 
 

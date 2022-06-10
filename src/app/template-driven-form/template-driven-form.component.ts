@@ -10,6 +10,7 @@ import { Animal } from '../animal';
 export class TemplateDrivenFormComponent implements OnInit {
 
   title = 'Template Driven Forms'
+  isVisible: boolean = true
 
   // data model for single input using two-way data binding
   plant: string = '';
@@ -34,6 +35,10 @@ export class TemplateDrivenFormComponent implements OnInit {
 
   onSubmit() {
     console.log(this.animal);
+  }
+
+  onToggleElement(): void {
+    this.isVisible = !this.isVisible;
   }
 
 }

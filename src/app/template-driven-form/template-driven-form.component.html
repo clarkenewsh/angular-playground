@@ -9,6 +9,9 @@
 
   <!-- TEMPLATE DRIVEN FORM  - USING FORM VARIABLE TO CAPTURE FORM STATE ON SUBMIT -->
   <h3>Reactive Form with Submit</h3>
+  <button (click)="onToggleElement()">Visability clicker</button>
+  <button (click)="onToggleElement()">X</button>
+  <p *ngIf='isVisible'>Toggled element</p>
   <form #someForm="ngForm" (ngSubmit)="onSubmit()">
     <input type="text" name="name" [(ngModel)]="animal.name" required placeholder="Enter Animal name...">
     <input type="text" name="breed" [(ngModel)]="animal.breed" required placeholder="Enter Animal breed...">
