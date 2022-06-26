@@ -107,7 +107,7 @@
           - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (best practice & keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
           - Angular Uni Blog Resource
             - https://blog.angular-university.io/angular-ngclass-ngstyle/
-            
+
             Example conditional class: 
                 <div [ngClass]="cardClasses()></div>
 
@@ -131,6 +131,7 @@
               }
 
       - Template Querying: viewChild & viewChildren - get a reference to the component 
+        - If we want to write component initialization code that uses the references injected by @ViewChild, we need to do it inside the AfterViewInit lifecycle hook.
         - @ViewChild(CourseCardComponent) card: CourseCardComponent;
         - @ViewChild('container') containerDiv: ElementRef; View Child Decorator - get html element reference object
         - @ViewChild('container', {read: ElementRef}) containerDiv: ElementRef; - View Child Decorator - get html element in relation to the html DOM element (not component)
@@ -755,7 +756,9 @@
       - Application Service Singleton concepts - when a services is provided at the root of the application and therefore can be used application wide using Dependency Injection
       - Singleton Dependency Injection enables us to use the concept of 'Tree Shakable Providers' which should be used in most cases unless a specific components has state and we want to inject a service to that s single component and not the 'root' of the app
       - @Self Decorator can be used to apply a a service for only a single component
-      - @Host Decorator can be used to apply a single instance of of a service to custom directive - Much like the highlighted directive created in the deep dive course -->
+      - @Host Decorator can be used to apply a single instance of of a service to custom directive - Much like the highlighted directive created in the deep dive course 
+      - Angular Uni Blog Resource
+        - https://blog.angular-university.io/angular-dependency-injection/ --> 
 
   <!-- 5 - Pipes 
       - Angular has built in pipes(below) and custom pipes can also be created 
