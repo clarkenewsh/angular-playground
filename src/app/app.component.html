@@ -65,7 +65,11 @@
         - ng-container can also be used when using the async pipe to subscribe top Observables instea dof creating a extra div element to house the async pipe
         - *ngIf can be used in multiple ways - boolean expression on object (entire object is best practice as it will bypass the undefined object and still show the remaining course objects) or individual object property, custom function calls etc
         - *ngIf with 'else' can be used to display an error message were else is a ng-template with template variable using #templateVaribleName
-        - index as i
+        - *ngFor allows us to build data presentation lists and tables in our HTML templates.
+        - index as i to index each item in the ngFor loop
+        - first & last can be used with ngFor to get the first and last index of the for loop. We can then target them and use for styling for example.
+          - first as isFirst; 
+          - last as isLast;
         - ng-template to show error messages or replace course image, conditional html structure,
         - Angular Uni Blog Resource
           - https://blog.angular-university.io/angular-ngif/
