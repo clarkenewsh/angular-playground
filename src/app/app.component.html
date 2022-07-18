@@ -8,6 +8,8 @@
         - Template Driven Form Validation: (<input required>, <input minlength="2">, <input maxlength="10">, <input pattern="[a-z]+"). Validation message like this: <div *ngIf="name.invalid && (name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
         - Reactive Form Validation: someForm = new FormGroup({ name: new FormControl this.nameInput, Validators.required, Validation.minLength(4)}). Validation message like this: <div *ngIf="name.invalid && name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
       - (keyup) change detection concept can also be used to actively track changes to the data model and re-render the view up change
+      - See reactive forms component in this project to see how to best implement a Reactive Form
+      - Angular 14 new feature 'strictly typed forms' which apples TS types to Reactive Forms (https://blog.angular-university.io/angular-typed-forms/)
       - Angular Uni Blog Resource
         - https://blog.angular-university.io/tag/angular-forms/
 
