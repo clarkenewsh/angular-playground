@@ -8,15 +8,20 @@
         - Template Driven Form Validation: (<input required>, <input minlength="2">, <input maxlength="10">, <input pattern="[a-z]+"). Validation message like this: <div *ngIf="name.invalid && (name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
         - Reactive Form Validation: someForm = new FormGroup({ name: new FormControl this.nameInput, Validators.required, Validation.minLength(4)}). Validation message like this: <div *ngIf="name.invalid && name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
       - (keyup) change detection concept can also be used to actively track changes to the data model and re-render the view up change
+      - Angular Uni Blog Resource
+        - https://blog.angular-university.io/tag/angular-forms/
 
   2 - Components / core directives
+      - Angular Uni Blog Resource
+        - https://blog.angular-university.io/tag/angular-core/
       - Text Interpolation from class properties values
       - Parent/Child components
         - @Input for data binding from parent to child component - define property in parent in, pass in to component declaration with attribute binding [course]=[course] and @Input inside child component ts file (use the interface type to declare in child component to make type safe) i.e @Input course: Course;
         - @Output new EventEmitter for event binding/emitting
           - Native click events can be bubbled up from child to parent without using @Output, just need (click) in the component declaration
           - Custom events will need the @Output EventEmitter to bubble up -  define method in the parent component, name the event in the @Output in the child component ts file with typescript defined what it getting outputted, $event can be caught in the component declaration and then caught in the parent component as params as we used the $event & EventMiter
-              - Example of custom events:
+              
+          - Example of custom events:
 
               ** App Component.ts 
                 **catch course payload as course param using the $event and Event emitter 
@@ -53,20 +58,25 @@
 
       - Structural directives 
         - *ngFor, *ngIf, ngContainer (used when we need a div to conditionally render html structure), *ngSwitchCase elvis operator?
-          - *ngIf can be used in multiple ways - boolean expression on object (entire object is best practice as it will bypass the undefined object and still show the remaining course objects) or individual object property, custom function calls etc
-          - *ngIf with 'else' can be used to display an error message were else is a ng-template with template variable using #templateVaribleName
-          - Angular Uni Blog Resource
-            - https://blog.angular-university.io/angular-ngif/
-                - Example:
+        - ng-container (this is how angular works under the hood when using *ngIf/*ngFor)
+        - ng-container can be used instead of a div to apply conditional structural rendering (dont apply a div just to apply conditional rendering. ng-container should be used in this situation)
+        - ng-container can also be used when using the async pipe to subscribe top Observables instea dof creating a extra div element to house the async pipe
+        - *ngIf can be used in multiple ways - boolean expression on object (entire object is best practice as it will bypass the undefined object and still show the remaining course objects) or individual object property, custom function calls etc
+        - *ngIf with 'else' can be used to display an error message were else is a ng-template with template variable using #templateVaribleName
+        - index as i
+        - ng-template to show error messages or replace course image, conditional html structure,
+        - Angular Uni Blog Resource
+          - https://blog.angular-university.io/angular-ngif/
 
-                  <ng-content select="course-image" *ngIf="course.iconUrl; else noImage">
-                    Course Img here using ng-content using content projection to show course image 
-                  </ng-content>
+            - Example:
+              <ng-content select="course-image" *ngIf="course.iconUrl; else noImage">
+                Course Img here using ng-content using content projection to show course image 
+              </ng-content>
 
-                  **Instantiate template reference 
-                  <ng-template #noImage>
-                    <p class="warn">{{course.description}} has no image is available</p>
-                  </ng-template>
+              **Instantiate template reference 
+              <ng-template #noImage>
+                <p class="warn">{{course.description}} has no image is available</p>
+              </ng-template>
   
           - elvis operator? can be used to bypass an undefined object value or object property so that the rest of the course are still displayed
           - *ngSwitch can be used when we want to conditionally render more than two outcomes 
@@ -95,16 +105,12 @@
                       </div>
                     </ng-container>
 
-        - index as i
-        - ng-container (this is how angular works under the hood when using *ngIf/*ngFor)
-        - ng-container can be used instead of a div to apply conditional structural rendering (dont apply a div just to apply conditional rendering. ng-container should be used in this situation)
-        - ng-template to show error messages or replace course image, conditional html structure,
-        - Conditional style classes using [ngClass]
-        - Angular Uni Blog Resource - ngContent,ngContainer,ngTemplate, ngTemplateOutlet 
-          - https://blog.angular-university.io/angular-ng-template-ng-container-ngtemplateoutlet/
+      - Angular Uni Blog Resource - ngContent,ngContainer,ngTemplate, ngTemplateOutlet 
+        - https://blog.angular-university.io/angular-ng-template-ng-container-ngtemplateoutlet/
 
       - Attribute, class & style directives for dynamic styling ([src], [title], [course], ngModel, ngClass, ngStyle, ngSwitch). <h1>[ngClass]="{isActive ? 'activeClass' : '' }"</h1>
           - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (best practice & keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
+          - Conditional style classes using [ngClass]
           - Angular Uni Blog Resource
             - https://blog.angular-university.io/angular-ngclass-ngstyle/
 
@@ -145,6 +151,7 @@
         - 'Select' can be used inside the <ng-content> to limit what content we would like the <ng-content> to house & display. Element selectors and css selectors can also be used to identify what content to project
         - Angular Uni Blog Resource
           - https://blog.angular-university.io/angular-ng-content/
+          - https://blog.angular-university.io/angular-ng-template-ng-container-ngtemplateoutlet/
             
           EXAMPLE of Content Projection:
 
@@ -169,6 +176,9 @@
 
       - Angular Templates (ng-template) can be used to provide alternative content block within a components view - For example if no course image show the ng-template content with blank image placeholder
          - Use template block to display error message if course object image (ng-content) is not available - using 'else', blankImage template variable to place a placeholder image in ng-content block
+         - Angular Uni Blog Resource - ngContent,ngContainer,ngTemplate, ngTemplateOutlet 
+          - https://blog.angular-university.io/angular-ng-template-ng-container-ngtemplateoutlet/
+         
           EXAMPLE:
           ** CourseCardComponent.html
 
@@ -216,6 +226,9 @@
 
         - Templates can also be implemented using component inputs. Best practice to instantiate ng-template as an input param directly into the component as done below in course-card component [noImageTpl]="blankImage"
           - Instantiate ng-template using ngTemplateOutlet within ng-container (best practice to instantiate ng-template as an input param directly into the component as done below in course-card component [noImageTpl]="blankImage"
+          - Angular Uni Blog Resource - ngContent,ngContainer,ngTemplate, ngTemplateOutlet 
+             - https://blog.angular-university.io/angular-ng-template-ng-container-ngtemplateoutlet/
+
           EXAMPLE;
           **courseCardComponent.ts
             **Receive noImageTpl template as input variable
@@ -864,6 +877,7 @@
           - Feature modules must have exports to allow the root module to understand that we want to use this modules components: [CourseCardComponent, CourseImageComponent]
           - ** Remember to refactor all the necessary imports, declarations etc when refactoring a feature module
       - Feature Module Lazy Loading with Routes
+      - As well as feature modules we can have shared modules 
       - Angular Uni Blog Resource
         - https://blog.angular-university.io/angular2-ngmodule/
 
@@ -883,18 +897,25 @@
 
   10 - Observables & RxJS Library
       - RxJS is a library for composing asynchronous and event-based programs by using observable sequences.
-  
+      - GitHub Links for course specific notes:
+        - RxJs in Practice Course: https://github.com/clarkenewsh/angular-rxjs-in-practice-subjects-storePattern/blob/main/rxjsInPracticeCourseNotes.md
+       
   11 - Reactive Angular In Practice
-
+        - See course notes for how to to apply reactive patterns to Angular apps (stateless observable service, Reactive Component Interaction, Auth State Management, Master Detail UI Pattern, Single Data Observable Pattern)
+        - Reactive Angular Course: https://github.com/clarkenewsh/reactive-angular-with-rxjs/blob/main/reactiveAngularCourseNotes.md
 
   12 - Animations 
       - ng module for animation library
 
-  13 - Testing 
+  13 - Angular Material
+        - Angular Uni Blog Resource:
+          - https://blog.angular-university.io/tag/angular-material/
+
+  14 - Testing 
       - Unit
       - End-to-end
 
-  14 - Best Practices 
+  15 - Best Practices 
       - Large scale applications & architecture 
       - Security
       - Accessibility 
