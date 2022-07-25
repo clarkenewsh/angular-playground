@@ -117,10 +117,28 @@
       - Attribute, class & style directives for dynamic styling ([src], [title], [course], ngModel, ngClass, ngStyle, ngSwitch). <h1>[ngClass]="{isActive ? 'activeClass' : '' }"</h1>
           - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (best practice & keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
           - Conditional style classes using [ngClass]
+          - We can even apply a class to a html element if a member variables is true or false using [class.btn-primary] that is activating the btn-primary CSS class, effectively adding it to the button.
+            - Example:
+              <button class="btn" 
+                [class.btn-primary]="true" 
+                type="submit">Button
+               </button>
+
+            - We could also instead of adding true to the expression directly like above, we could use a member variable such is 'isSelected: boolean = false' and when this value is toggled the .btn-primary class could be turned on or of
+              - Example:
+              <button class="btn" 
+                [class.btn-primary]="isSelected" 
+                type="submit">Button
+               </button>
+
+               toggleSelected() {
+                this.isSelected = !this.isSelected;
+               }
+
           - Angular Uni Blog Resource
             - https://blog.angular-university.io/angular-ngclass-ngstyle/
 
-            Example conditional class: 
+            Example conditional class (changing the class in a method): 
                 <div [ngClass]="cardClasses()></div>
 
                 ** add conditional styling to class - beginner courses true, apply 'beginner' class
@@ -639,83 +657,165 @@
             **PUT REQUEST:
 
 
-
-
-            
-
-
-
       4 - Angular Change Detection
-      - Change detection is a concept that angular rebuild a components view when a model get changed. Ie when backend data changes it is rendered to the screen (must like two way data binding with ngModel)
-      - (keyup) is another default change detection event in angular. It checks for changes in the data property model value upon each key stroke in input field (can be expensive as its checking the entire view and component for changes in data properties)
-            - Example below (function and component view);
-            
-            Edit Title: <input #courseTitle [value]="course.description" (keyup)="onTitleChanged(courseTitle.value)">
-          
-            // Change course title on keyup event
-            onTitleChanged(newTitle: string) {
-              this.course.description = newTitle;
-            }
 
-      - Default Change Detection can be expensive (reduce performance) in a large applications when listening to changes to frequently 
-      - OnPush change change detection is more efficient but trickier to use as you cant directly mutate the data directly as its not actively looking for changes in the view. It doesnt actively check changes in the data model that the view is outputting. You must copy the data model using the spread operator and then change the data model properties (much like in react)- implement in @Component ({changeDetection: ChangeDetionStrategy.OnPush})
-          - OnPush change detection will only work with Observable data when using the async pipe. Not using the manual subscribe solution
-          - OnPush is a good option when handling a lot of data as it is better for performance 
-          - OnPush change detection can not mutate the data directly in the view (much like state on react)
-          - default change detection: Angular decides if the view needs to be updated by comparing all the template expression values before and after the occurrence of an event, for all components of the component tree
-          - OnPush change detection: this works by detecting if some new data has been explicitly pushed into the component, either via a component input or an Observable subscribed to using the async pipe
+        - Change Detection Overview:
+          - Change detection is the process through which Angular checks to see whether your application state has changed, and if any DOM needs to be updated. At a high level, Angular walks your components from top to bottom, looking for changes. Angular runs its change detection mechanism periodically so that changes to the data model are reflected in an app’s view. Change detection can be triggered either manually or through an asynchronous event (for example, a user interaction or an XHR completion).Change detection is a highly optimized performant, but it can still cause slowdowns if the application runs it too frequently.
+
+          - Change detection is the process that allows Angular to keep our views in sync with our models / Change detection is a concept that angular rebuild a components view when a model data gets updated or changes. 
+          - We can optimize the change detection mechanism by skipping parts of your application and running change detection only when necessary.
+        
+        - Default Change Detection Overview:
+          - Default Change Detection is what is happening when we update data within models or update member variables which then checks every data expression in the template, its compares the current value of the property in the expression with the previous value. If the previous and current values are different Angular in the background will set isChanged to true which then triggers Angular to re-render the components view with the changed data. 
+
+          - Default change detection is basically when Angular decides if the view needs to be updated by comparing all the template expression values before and after the occurrence of an event, for all components of the component tree
+
+          - Best practice is to use default change detection where possible (where default change detection is causing performance issues, this is when using onPush Change Detection Strategy should be considered)
+
+          - Default can be expensive (reduce performance) in a large applications when listening to changes to frequently throughout the applications component tree. Especially is the component hierarchy is large.
+
+          - Default change detection: Angular decides if the view needs to be updated by comparing all the template expression values before and after the occurrence of an event, for all components of the component tree, from parent to child. If the component tree is large this is where default change detection can slow down the application.
+
+          - (keyup) is an another example of default change detection event in angular. It checks for changes in the data property model value upon each key stroke in input field (can be expensive as its checking the entire view and component for changes in data properties).
+
+          - Example below (function and component view):
+        
+          Edit Title: <input #courseTitle [value]="course.description" (keyup)="onTitleChanged(courseTitle.value)">
+        
+          // Change course title on keyup event
+          onTitleChanged(newTitle: string) {
+            this.course.description = newTitle;
+          }
+
+        - Change Detection Learning Resource: 
           - Angular Uni Blog resource 
             - https://blog.angular-university.io/how-does-angular-2-change-detection-really-work/
             - https://blog.angular-university.io/onpush-change-detection-how-it-works/
-              
-            Example of OnPush Change Detection (without Observable Courses Data Streams);
 
-              @Component({
-                selector: 'course-card',
-                templateUrl: './course-card.component.html',
-                styleUrls: ['./course-card.component.css'],
-                changeDetection: ChangeDetectionStrategy.OnPush
+          - Angular Docs
+            - https://angular.io/guide/change-detection
+
+          - Angular Guide 
+            - https://angular-training-guide.rangle.io/change-detection
+
+
+        - Optimizing Slow Computations Overview:
+          - You can identify heavy computations with Angular DevTools’ profiler. In the performance timeline, click on a bar to preview a particular change detection cycle. This displays a bar chart, which shows how long the framework spent in change detection for each component. When you click on a component, you can preview how long Angular spent evaluating its template and lifecycle hooks.
+
+          - There are several techniques to eliminate slow computations:
+            1. Optimizing the underlying algorithm. This is the recommended approach; if you can speed up the algorithm that is causing the problem, you can speed up the entire change detection mechanism.
+
+            2. Caching using pure pipes. You can move the heavy computation to a pure pipe. Angular will reevaluate a pure pipe only if it detects that its inputs changed, compared to the previous time Angular called it.
+
+            3. Using memoization. Memoization is a similar technique to pure pipes, with the difference that pure pipes preserve only the last result from the computation where memoization could store multiple results.
+
+            4. Avoid repaints/reflows in lifecycle hooks. Certain operations cause the browser to either synchronously recalculate the layout of the page or re-render it. Since reflows and repaints are generally slow, we want to avoid performing them in every change detection cycle.
+          
+          - Pure pipes and memoization have different trade-offs. Pure pipes are an Angular built-in concept compared to memoization, which is a general software engineering practice for caching function results. The memory overhead of memoization could be significant if you invoke the heavy computation frequently with different arguments.
+
+          - Optimizing Slow Computations Learning Resource:
+            - https://angular.io/guide/change-detection-slow-computations
+
+
+  .     - Zone Pollution Overview:
+          - Zone.js is a signaling mechanism that Angular uses to detect when an application state might have changed. It captures asynchronous operations like setTimeout, network requests, and event listeners. Angular schedules change detection based on signals from Zone.js
+
+          - You can detect unnecessary change detection calls using Angular DevTools. Often they appear as consecutive bars in the profiler’s timeline with source setTimeout, setInterval, requestAnimationFrame, or an event handler. When you have limited calls within your application of these APIs, the change detection invocation is usually caused by a third-party library.
+
+          - We can therefore run code outside the Angular zone to avoid unnecessary change detection calls using this strategy.
+
+          - Since all asynchronous code executed from within Angular's zone can trigger change detection you may prefer to execute some code outside of Angular's zone when change detection is not required. To run code outside of Angular's context, NgZone provides a method aptly named runOutsideAngular. Using this method, Angular's zone will not interact with your code and will not receive events when the global zone becomes stable.
+
+          - Third-party libraries commonly trigger unnecessary change detection cycles because they weren't authored with Zone.js in mind. Avoid these extra cycles by calling library APIs outside the Angular zone:
+
+          - Zone Pollution Learning Resource:
+            - https://angular-training-guide.rangle.io/zones
+            - https://angular.io/guide/change-detection-zone-pollution
+
+
+        - OnPush Change Detection Strategy:
+          - JavaScript, by default, uses mutable data structures that you can reference from multiple different components. Angular runs change detection over your entire component tree to make sure that the most up-to-date state of your data structures is reflected in the DOM. Change detection is sufficiently fast for most applications. However, when an application has an especially large component tree, running change detection across the whole application can cause performance issues. You can address this by configuring change detection to only run on a subset of the component tree. If you are confident that a part of the application is not affected by a state change, you can use OnPush to skip change detection in an entire component subtree.
+
+          - OnPush change detection: this works by detecting if some new data has been explicitly pushed into the component, either via a component input or an Observable subscribed to using the async pipe.
+
+          - OnPush change detection instructs Angular to run change detection for a component subtree only when:
+            1. The root component of the subtree receives new inputs as the result of a template binding. Angular compares the current and past value of the input with ==
+
+            2. Angular handles an event (e.g. using event binding, output binding, or @HostListener) in the subtree's root component or any of its children whether they are using OnPush change detection or not.
+
+          - OnPush change change detection is more efficient but trickier to use as you cant directly mutate the data directly as its not actively looking for changes in the view. It doesn't actively check changes in the data model that the view is outputting. You must copy the data model using the spread operator and then change the data model properties (much like in react).
+
+          - We implement OnPush Change Detection in @Component Decorator as below;
+            
+          import { ChangeDetectionStrategy, Component } from '@angular/core';
+              
+            @Component({
+                changeDetection: ChangeDetectionStrategy.OnPush,
+              })
+              export class MyComponent {}
+          
+          - OnPush change detection will only work with Observable data when using the async pipe. Not using the manual subscribe solution.
+
+          - OnPush is a good option when handling a lot of data as it is better for performance.
+
+          - OnPush change detection can not mutate the data directly in the view (much like state on react). We must create a copy using the spread operator. This is then detected by OnPush Change Detection and the new copy of data with value changes will be updated 
+
+          - Default change detection: Angular decides if the view needs to be updated by comparing all the template expression values before and after the occurrence of an event, for all components of the component tree, from parent to child. If the component tree is large this is where default change detection can slow down the application.
+          
+
+          - Angular OnPush Change Detection Learning Resource:
+            - https://blog.angular-university.io/how-does-angular-2-change-detection-really-work/
+            - https://blog.angular-university.io/onpush-change-detection-how-it-works/
+            - https://angular.io/guide/change-detection-skipping-subtrees
+            - https://angular-training-guide.rangle.io/change-detection
+              
+          - Example of OnPush Change Detection (without Observable Courses Data Streams);
+
+            @Component({
+              selector: 'course-card',
+              templateUrl: './course-card.component.html',
+              styleUrls: ['./course-card.component.css'],
+              changeDetection: ChangeDetectionStrategy.OnPush
             })
 
-              // Edit course (without mutating directly so we can use OnPush change detection)
-              onEditCourse() {
-                
-                const course = this.courses[0];
-            
-                // spread over & copy course to change description property
-                const newCourse:any = {...course};
-            
-                newCourse.description = "New Value";
-                console.log(newCourse)
-                this.courses[0].description = newCourse;
-              }
-            
-
-            Example of OnPush Change Detection (with Observable Courses Data Streams);
+            > Edit course (without mutating directly so we can use OnPush change detection)
+            onEditCourse() {
               
-              // CourseCardComponent
-              @Component({
-                selector: 'course-card',
-                templateUrl: './course-card.component.html',
-                styleUrls: ['./course-card.component.css'],
-                changeDetection: ChangeDetectionStrategy.OnPush
-            })
+              const course = this.courses[0];
+          
+              > spread over & copy course to change description property
+              const newCourse:any = {...course};
+          
+              newCourse.description = "New Value";
+              console.log(newCourse)
+              this.courses[0].description = newCourse;
+            }
+          
+
+          - Example of OnPush Change Detection (with Observable Courses Data Streams);
             
-            // App component.ts
-            courses$: Observable<Course[]>
+            > CourseCardComponent
+            @Component({
+              selector: 'course-card',
+              templateUrl: './course-card.component.html',
+              styleUrls: ['./course-card.component.css'],
+              changeDetection: ChangeDetectionStrategy.OnPush
+          })
+          
+          > App component.ts
+          courses$: Observable<Course[]>
 
-              // App component.html
-            <div class="courses" *ngIf="(courses$ | async) as courses">
-              <course-card *ngFor="let course of courses"
-                          [course]="course"
-                          (courseChanged)="save($event)">
-                <course-image [src]="course.iconUrl"></course-image>
+          > App component.html
+          <div class="courses" *ngIf="(courses$ | async) as courses">
+            <course-card *ngFor="let course of courses"
+                        [course]="course"
+                        (courseChanged)="save($event)">
+              <course-image [src]="course.iconUrl"></course-image>
 
-              </course-card>
-            </div>
+            </course-card>
+          </div>
 
-      - Best practice is to use default change detection where possible 
-      - Custom Change Detection can be implemented to tell angular to looks for changes in particular component (not best practice and should be used only when manually requesting changes i.e every 2seconds when dealing with lots of data continually)
+        - Custom Change Detection can be implemented to tell angular to looks for changes in particular component (not best practice and should be used only when manually requesting changes i.e every 2seconds when dealing with lots of data continually)
           - Implemented in constructor and ngOnInit, data subscribe function as below
           - Best way to implement is with the DoCheck & ngDoCheck() lifecycle hook as per below;
 
@@ -738,11 +838,10 @@
             
               this.loaded = true;
 
-            })
-            
+            }) 
           }
 
-      - Attribute Decorator can be used when we have lots of inputs passed in to a component that will not require a change in data 
+        - Attribute Decorator can be used when we have lots of inputs passed in to a component that will not require a change in data 
           - Attribute decorator implemented as below in the component constructor;
             constructor(@Attribute('type') private type: string)) {
 
@@ -753,19 +852,77 @@
 
             </component> -->
 
-  <!-- 5 - Lifecycle Hooks
-       - Constructor() gets called first 
-       - ngOninit() gets called once when the component is first initialized after the constructor
-       - ngOninit() is the fist stage the component gets the @Input member variables i.e course data
-       - ngOnDestroy() gets called when the components gets destroyed. Great way to clean up any resources that the component is using i.e Observable data streams
-       - If using async pipe with Observable, ngOnDestroy() is not needed to unsubscribe from the observable as the async pipe does this automatically.
-       - ngOnChanges() lifecycle hook gets called after constructor and before ngOnInit. When @Input member variables gets updated (not mutated directly). 
+  <!-- 5 - Component Lifecycle Hooks
+      - A component instance has a lifecycle that starts when Angular instantiates the component class and renders the component view along with its child views. The lifecycle continues with change detection, as Angular checks to see when data-bound properties change, and updates both the view and the component instance as needed. The lifecycle ends when Angular destroys the component instance and removes its rendered template from the DOM. Directives have a similar lifecycle, as Angular creates, updates, and destroys instances in the course of execution.
+
+      - Your application can use lifecycle hook methods to tap into key events in the lifecycle of a component or directive to initialize new instances, initiate change detection when needed, respond to updates during change detection, and clean up before deletion of instances. 
+
+      - Respond to events in the lifecycle of a component or directive by implementing one or more of the lifecycle hook interfaces in the Angular core library. The hooks give you the opportunity to act on a component or directive instance at the appropriate moment, as Angular creates, updates, or destroys that instance.
+
+      - You don't have to implement all (or any) of the lifecycle hooks, just the ones you need.
+
+      - After your application instantiates a component or directive by calling its constructor, Angular calls the hook methods you have implemented at the appropriate point in the lifecycle of that instance.
+      
+      - Angular Component Lifecycle Hooks in the order they are executed:
+
+        - Constructor() gets called first when the component instance is created.
+          - Here we declare dependency injection services and OnPush Change Detection 
+
+        - ngOnChanges() lifecycle hook gets called after constructor and before ngOnInit. 
+          - It is called when an @Input member variable/binding value changes & gets updated (not mutated directly within a method in the component or directive but can use the spread operator to make a copy of the input and then change the value. This will trigger ngOnChanges()). 
+          - When the @Input member variables gets updated the template gets recalculated and the view gets updated.
+          - The method receives a 'SimpleChanges' object of current and previous property values (much like in DTO map-wrapper directive)
+            - Simple Changes is a hashtable of changes represented by SimpleChange objects stored at the declared property name they belong to on a Directive or Component. This is the type passed to the ngOnChanges hook.
+          - The ngOnChanges() method takes an object that maps each changed property name to a SimpleChange object holding the current and previous property values. This hook iterates over the changed properties and logs them.
+          - If your component has no inputs or you use it without providing any inputs, the framework will not call ngOnChanges().
           - If using spread operator to mutate the @Input member variables it does work.
-          - useful is you want to call a callback function when data has changed.
-       - ngAfterContentChecked() Gets called when content of the component gets projected the the UI and checked. @Input data properties can be mutated in this function in some cases.
-       - ngViewChecked() gets called after ngAfterContentChecked. Can't modify @Input data at this point. Main use case is to perform common DOM operations such as scroll to the bottom of a screen after components has finished running through the prior lifecycle methods, focus on DOM element.
-       - ngAfterViewInit() is related to content project
-       - ngAfterViewInit() is related local template querying -->
+          - Useful is you want to call a callback function when data has changed.
+          - Code example - https://angular.io/guide/lifecycle-hooks#onchanges
+
+        - ngOnInit() gets called after the first ngOnChanges hook once when the component is first initialized. 
+          - Called once, after the first ngOnChanges(). ngOnInit() is still called even when ngOnChanges() is not (which is the case when there are no template-bound inputs).
+          - Initialize the directive or component after Angular first displays the data-bound properties and sets the directive or component's input properties. See details in Initializing a component or directive in this document.
+          - We can use this for example to call a function that loads some data - course data in the example of Angular University Course.
+          - ngOnInit is a good place for a component to fetch its initial data.
+
+        - ngDoCheck() is called after every Change Detection run. 
+          - Called immediately after ngOnChanges() on every change detection run, and immediately after ngOnInit() on the first run.
+          - It is used to Detect and act upon changes that Angular can't or won't detect on its own. See details and example in Defining custom change detection in this document.
+          - ngDoCheck() is used when implementing Custom onPush Change Detection and is placed between the constructor and ngOnInit
+          - See above OnPush Change Detection notes for code example.
+
+        - ngAfterContentInit() gets called after every check of component content is antialiased. 
+          - Its called once after the first ngDoCheck()
+          - Respond after Angular projects external content into the component's view, or into the view that a directive is in.
+          - Use case would be to project external content into a component and how to distinguish projected content from a component's view children. Demonstrates the ngAfterContentInit() and ngAfterContentChecked() hooks.
+        
+        - ngAfterContentChecked() gets called after very check of a components content, when content of the component gets projected the the UI and checked. 
+          - Called after ngAfterContentInit() and every subsequent ngDoCheck().
+          - Its purpose is to Respond after Angular checks the content projected into the directive or component.
+          - @Input data properties can be mutated in this function in some cases.
+        
+        - ngAfterViewInit() gets called after a components views (parent/child) are antialiased.
+          - Called once after the first ngAfterContentChecked().
+          - Its purpose is to respond after Angular initializes the component's views and child views, or the view that contains the directive.
+          - ngAfterViewInit is related to content projection
+          - ngAfterViewInit is related local template querying 
+
+        - ngAfterViewChecked() gets called after every check of a components views.
+          - Called after the ngAfterViewInit() and every subsequent ngAfterContentChecked(). 
+          - Its purpose is to respond after Angular checks the component's views and child views, or the view that contains the directive.
+          - Can't modify @Input data at this point. Main use case is to perform common DOM operations such as scroll to the bottom of a screen after components has finished running through the prior lifecycle methods, focus on DOM element.
+
+        - ngOnDestroy() gets called when the components gets destroyed. 
+          - Called immediately before Angular destroys the directive or component.
+          - Its purpose is to cleanup just before Angular destroys the directive or component. Unsubscribe Observables and detach event handlers to avoid memory leaks. 
+          - Great way to clean up any resources that the component is using i.e Observable data streams
+          - If using async pipe with Observable, ngOnDestroy() is not needed to unsubscribe from the observable as the async pipe does this automatically.
+        
+      - Component Lifecycle Hooks Resources:
+        - Angular Docs - https://angular.io/guide/lifecycle-hooks
+        - Angular Training Guide - https://angular-training-guide.rangle.io/advanced-components/component_lifecycle  
+        - Angular Uni - https://blog.angular-university.io/how-does-angular-2-change-detection-really-work/ 
+        - Angular Uni - https://blog.angular-university.io/onpush-change-detection-how-it-works/ -->
 
   <!-- 4 - Services & Dependency Injection 
       - Dependency Injection allows us to inject a service anywhere win the application
@@ -776,6 +933,7 @@
       - Singleton Dependency Injection enables us to use the concept of 'Tree Shakable Providers' which should be used in most cases unless a specific components has state and we want to inject a service to that s single component and not the 'root' of the app
       - @Self Decorator can be used to apply a a service for only a single component
       - @Host Decorator can be used to apply a single instance of of a service to custom directive - Much like the highlighted directive created in the deep dive course 
+
       - Angular Uni Blog Resource
         - https://blog.angular-university.io/angular-dependency-injection/ --> 
 
@@ -871,21 +1029,23 @@
 
   7 - Modules / NgModules
       - App.module.ts is the root module
-            - Declarations: (components, directives)
-            - Imports: (BrowserModule, HttpClient, BrowserAnimationsModule, feature modules )
-            - Providers: (Services)
-            - bootstrap: (AppComponent)
-      - Pipes can be applied to module
+        - Declarations: (components, directives)
+        - Imports: (BrowserModule, HttpClient, BrowserAnimationsModule, feature modules )
+        - Providers: (Services)
+        - bootstrap: (AppComponent)
+      - Pipes, services & custom directives can be applied to a shared module / feature module. 
       - Feature Modules can be create with ng generate module courses to group tightly related components, services, directives & pipes (large applications)
-          - The course module is an example that would include all the course related components, services, directives & pipes
-          - Feature modules can include components, services, directives, pipes 
-          - All feature modules must include CommonModule
-          - Feature modules must have exports to allow the root module to understand that we want to use this modules components: [CourseCardComponent, CourseImageComponent]
-          - ** Remember to refactor all the necessary imports, declarations etc when refactoring a feature module
+        - The course module is an example that would include all the course related components, services, directives & pipes
+        - Feature modules can include components, services, directives, pipes 
+        - All feature modules must include CommonModule
+        - Feature modules must have exports to allow the root module to understand that we want to use this modules components: [CourseCardComponent, CourseImageComponent]
+        - ** Remember to refactor all the necessary imports, declarations etc when refactoring a feature module
       - Feature Module Lazy Loading with Routes
       - As well as feature modules we can have shared modules 
-      - Angular Uni Blog Resource
+      - Angular Uni & Docs Blog Resource
         - https://blog.angular-university.io/angular2-ngmodule/
+        - https://angular-training-guide.rangle.io/modules
+        - https://angular.io/guide/feature-modules
 
   8 - Angular Internationalization
         - Enables us to make the app multi language 
@@ -905,11 +1065,25 @@
       - RxJS is a library for composing asynchronous and event-based programs by using observable sequences.
       - GitHub Links for course specific notes:
         - RxJs in Practice Course: https://github.com/clarkenewsh/angular-rxjs-in-practice-subjects-storePattern/blob/main/rxjsInPracticeCourseNotes.md
-       
+      - Learning Resource 
+        - Angular Uni Youtube
+        - Ng-Conf Youtube
+        - Decoded Frontend Youtube
+        - Angular Uni Blog 
+          - RxJs and Observables for Beginners: https://blog.angular-university.io/functional-reactive-programming-for-angular-2-developers-rxjs-and-observables/
+          - RxJs Blog Articles - https://blog.angular-university.io/tag/rxjs/
+
   11 - Reactive Angular In Practice
         - See course notes for how to to apply reactive patterns to Angular apps (stateless observable service, Reactive Component Interaction, Auth State Management, Master Detail UI Pattern, Single Data Observable Pattern)
         - Reactive Angular Course: https://github.com/clarkenewsh/reactive-angular-with-rxjs/blob/main/reactiveAngularCourseNotes.md
-
+        - Learning Resource:
+          - Angular Uni Youtube
+          - Ng-Conf Youtube
+          - Decoded Frontend Youtube
+          - Angular Uni Blog 
+            - RxJs and Observables for Beginners: https://blog.angular-university.io/functional-reactive-programming-for-angular-2-developers-rxjs-and-observables/
+            - RxJs Blog Articles - https://blog.angular-university.io/tag/rxjs/
+  
   12 - Animations 
       - ng module for animation library
 
