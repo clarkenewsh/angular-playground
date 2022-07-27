@@ -9,56 +9,53 @@
         - Reactive Form Validation: someForm = new FormGroup({ name: new FormControl this.nameInput, Validators.required, Validation.minLength(4)}). Validation message like this: <div *ngIf="name.invalid && name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
       - (keyup) change detection concept can also be used to actively track changes to the data model and re-render the view up change
       - See reactive forms component in this project to see how to best implement a Reactive Form
-      - Angular 14 new feature 'strictly typed forms' which apples TS types to Reactive Forms (https://blog.angular-university.io/angular-typed-forms/)
-      - Angular Uni Blog Resource
-        - https://blog.angular-university.io/tag/angular-forms/
+      - Angular 14 new feature 'Typed Form' which apples TS types to Reactive Forms (https://blog.angular-university.io/angular-typed-forms/)
+      - Angular Uni Blog Resource - https://blog.angular-university.io/tag/angular-forms/
 
   2 - Components / core directives
-      - Angular Uni Blog Resource
-        - https://blog.angular-university.io/tag/angular-core/
+      - Angular Uni Blog Resource - https://blog.angular-university.io/tag/angular-core/
       - Text Interpolation from class properties values
-      - Parent/Child components
+      - Parent/Child components:
         - @Input for data binding from parent to child component - define property in parent in, pass in to component declaration with attribute binding [course]=[course] and @Input inside child component ts file (use the interface type to declare in child component to make type safe) i.e @Input course: Course;
         - @Output new EventEmitter for event binding/emitting
-          - Native click events can be bubbled up from child to parent without using @Output, just need (click) in the component declaration
-          - Custom events will need the @Output EventEmitter to bubble up -  define method in the parent component, name the event in the @Output in the child component ts file with typescript defined what it getting outputted, $event can be caught in the component declaration and then caught in the parent component as params as we used the $event & EventMiter
-              
-          - Example of custom events:
+        - Native click events can be bubbled up from child to parent without using @Output, just need (click) in the component declaration
+        - Custom events will need the @Output EventEmitter to bubble up -  define method in the parent component, name the event in the @Output in the child component ts file with typescript defined what it getting outputted, $event can be caught in the component declaration and then caught in the parent component as params as we used the $event & EventMiter
+            
+        - Example of custom events:
 
-              ** App Component.ts 
-                **catch course payload as course param using the $event and Event emitter 
-                onCourseSelected(course:Course) {
-                  console.log("app comp - click event bubbled", course);
-                }
+        ** App Component.ts 
+          **catch course payload as course param using the $event and Event emitter 
+          onCourseSelected(course:Course) {
+            console.log("app comp - click event bubbled", course);
+          }
 
-              ** App Component.html
-                **Catch course object payload using the $event emitter, pass the payload to the courseSelected() custom event. *Custom event is named the same as the @Output EventEmitter
-                <course-card *ngFor="let course of courses; 
-                    index as i; 
-                    first as isFirst; 
-                    last as isLast;"
-                    [class.is-first]="isFirst" 
-                    [class.is-last]="isLast" 
-                    (courseSelected)="onCourseSelected($event)" 
-                    [course]="course" [cardIndex]="i + 1"
-                    [noImageTpl]="blankImage">
+        ** App Component.html
+          **Catch course object payload using the $event emitter, pass the payload to the courseSelected() custom event. *Custom event is named the same as the @Output EventEmitter
+          <course-card *ngFor="let course of courses; 
+              index as i; 
+              first as isFirst; 
+              last as isLast;"
+              [class.is-first]="isFirst" 
+              [class.is-last]="isLast" 
+              (courseSelected)="onCourseSelected($event)" 
+              [course]="course" [cardIndex]="i + 1"
+              [noImageTpl]="blankImage">
 
-                    <course-image [src]="course.iconUrl"></course-image>
-                </course-card>
+              <course-image [src]="course.iconUrl"></course-image>
+          </course-card>
 
-              ** Child Component.ts
-                @Output() courseSelected = new EventEmitter<Course>();
-                  
-                onCourseViewed() {
-                  console.log("card comp - button clicked")
-                  this.courseSelected.emit(this.course);
-                }
+        ** Child Component.ts
+          @Output() courseSelected = new EventEmitter<Course>();
+            
+          onCourseViewed() {
+            console.log("card comp - button clicked")
+            this.courseSelected.emit(this.course);
+          }
 
-              ** Child Component.html
-                <button (click)="onCourseViewed()">View Course</button>
+        ** Child Component.html
+          <button (click)="onCourseViewed()">View Course</button>
 
-
-      - Structural directives 
+      - Structural Directives 
         - *ngFor, *ngIf, ngContainer (used when we need a div to conditionally render html structure), *ngSwitchCase elvis operator?
         - ng-container (this is how angular works under the hood when using *ngIf/*ngFor)
         - ng-container can be used instead of a div to apply conditional structural rendering (dont apply a div just to apply conditional rendering. ng-container should be used in this situation)
@@ -68,16 +65,15 @@
         - *ngIf can be used with an else 'else' can be used to display an error message were else is a ng-template with template variable using #templateVariableName as the else clause.
         - With ngIf, if an element is hidden then that element does not exist at all in the page. Unlike using css to hide an element but is still loaded in to the DOM.
         - *ngFor allows us to build data presentation lists and tables in our HTML templates.
-        - Consuming Observable data with ngIf & the async pipe: Using *ngFor in a reactive pattern with Observable data we can use - <div *ngIf=”(c. By using 'as' we set a variable that takes on the values in the currenurrentOpenMenu$ | async) as currentOpenMenu””>tOpenMenu$ observable which we can then use in the template {{currentOpenMenu}}.
-          
-          Example Consuming Observable data with ngIf & the async pipe::
+        - Consuming Observable data with ngIf & the async pipe: Using *ngFor in a reactive pattern with Observable data we can use - <div *ngIf=”(currentOpenMenu$ | async) as currentOpenMenu””> observable which we can then use in the template {{currentOpenMenu}}. By using 'as' we set a variable that takes on the values of the currentOpenMenu$ observable and we then use this local as variable in the template. 
+
+          Example Consuming Observable data with ngIf & the async pipe:
           
           <ng-container *ngIf="(courses$ | async) as courses">
               <div class="courses">
                   {{courses.length}}
               </div> 
           </ng-container>
-
 
         - index as i to index each item in the ngFor loop
         - first & last can be used with ngFor to get the first and last index of the for loop. We can then target them and use for styling for example.
@@ -99,79 +95,84 @@
   
           - elvis operator? can be used to bypass an undefined object value or object property so that the rest of the course are still displayed
           - *ngSwitch can be used when we want to conditionally render more than two outcomes 
-                  Example ngSwitch:
-                  **[ngSwitch] attr & *ngSwitchCase / *ngSwitchDefault structural directive, used to show course level 
-                    <ng-container [ngSwitch]="course.category">
-                      <div class="course-category">
-                      <ng-container *ngSwitchCase="'BEGINNER'">
-                        <div class="category" >
-                        Beginner
-                        </div>
-                      </ng-container>
-                      <ng-container *ngSwitchCase="'INTERMEDIATE'">
-                        <div class="category" >
-                        Intermediate
-                        </div>
-                      </ng-container>
-                      <ng-container *ngSwitchCase="'ADVANCED'">
-                        <div class="category" >
-                        Advanced
-                        </div>
-                      </ng-container>
-                      <div class="category" *ngSwitchDefault>
-                        All Levels
-                      </div>
-                      </div>
-                    </ng-container>
+            Example ngSwitch:
+            **[ngSwitch] attr & *ngSwitchCase / *ngSwitchDefault structural directive, used to show course level 
+              <ng-container [ngSwitch]="course.category">
+                <div class="course-category">
+                <ng-container *ngSwitchCase="'BEGINNER'">
+                  <div class="category" >
+                  Beginner
+                  </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'INTERMEDIATE'">
+                  <div class="category" >
+                  Intermediate
+                  </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'ADVANCED'">
+                  <div class="category" >
+                  Advanced
+                  </div>
+                </ng-container>
+                <div class="category" *ngSwitchDefault>
+                  All Levels
+                </div>
+                </div>
+              </ng-container>
 
       - Angular Uni Blog Resource - ngContent,ngContainer,ngTemplate, ngTemplateOutlet 
         - https://blog.angular-university.io/angular-ng-template-ng-container-ngtemplateoutlet/
 
-      - Attribute, class & style directives for dynamic styling ([src], [title], [course], ngModel, ngClass, ngStyle, ngSwitch). <h1>[ngClass]="{isActive ? 'activeClass' : '' }"</h1>
-          - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (best practice & keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
-          - Conditional style classes using [ngClass]
-          - We can even apply a class to a html element if a member variables is true or false using [class.btn-primary] that is activating the btn-primary CSS class, effectively adding it to the button.
-            - Example:
-              <button class="btn" 
-                [class.btn-primary]="true" 
-                type="submit">Button
-               </button>
+      - Attribute, Class & Style directives for dynamic styling ([src], [title], [course], ngModel, ngClass, ngStyle, ngSwitch). 
+      - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (best practice & keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
+      - Conditional style classes using [ngClass]
+      - We can even apply a class to a html element if a member variables is true or false using [class.btn-primary] that is activating the btn-primary CSS class, effectively adding it to the button.
 
-            - We could also instead of adding true to the expression directly like above, we could use a member variable such is 'isSelected: boolean = false' and when this value is toggled the .btn-primary class could be turned on or of
-              - Example:
-              <button class="btn" 
-                [class.btn-primary]="isSelected" 
-                type="submit">Button
-               </button>
+        - Example(using boolean value):
+          <button class="btn" 
+            [class.btn-primary]="true" 
+            type="submit">Button
+            </button>
 
-               toggleSelected() {
-                this.isSelected = !this.isSelected;
-               }
+        - We could also instead of adding true to the expression directly like above, we could use a member variable such is 'isSelected: boolean = false' and when this value is toggled the .btn-primary class could be turned on or of
+          - Example (using boolean value from member variable):
+          <button class="btn" 
+            [class.btn-primary]="isSelected" 
+            type="submit">Button
+            </button>
 
-          - Angular Uni Blog Resource
-            - https://blog.angular-university.io/angular-ngclass-ngstyle/
+            toggleSelected() {
+            this.isSelected = !this.isSelected;
+            }
 
-            Example conditional class (changing the class in a method): 
-                <div [ngClass]="cardClasses()></div>
+        - We can also place the logic in the expression as below
+          - Example (class logic inline expression):
+            <h1>[ngClass]="{isActive ? 'activeClass' : '' }"</h1>
 
-                ** add conditional styling to class - beginner courses true, apply 'beginner' class
-                cardClasses() {
-                  if(this.course.category == 'BEGINNER') {
-                    return 'beginner';
-                  }
-                }
+      - Angular Uni Blog Resource
+        - https://blog.angular-university.io/angular-ngclass-ngstyle/
 
-            Example conditional style: 
-            	<div class="course-title" [ngStyle]="cardStyles()">
-                {{cardIndex + ' ' + course.description}}
-              </div>
+        Example conditional class (changing the class in a method): 
+            <div [ngClass]="cardClasses()></div>
 
-              ** add conditional style to element
-              cardStyles() {
-                return {
-                  'text-decoration': 'underline'
-                }
+            ** add conditional styling to class - beginner courses true, apply 'beginner' class
+            cardClasses() {
+              if(this.course.category == 'BEGINNER') {
+                return 'beginner';
               }
+            }
+
+        Example conditional style: 
+          <div class="course-title" [ngStyle]="cardStyles()">
+            {{cardIndex + ' ' + course.description}}
+          </div>
+
+          ** add conditional style to element
+          cardStyles() {
+            return {
+              'text-decoration': 'underline'
+            }
+          }
 
       - Template Querying: viewChild & viewChildren - get a reference to the component 
         - If we want to write component initialization code that uses the references injected by @ViewChild, we need to do it inside the AfterViewInit lifecycle hook.
@@ -315,60 +316,187 @@
 
       - Template variables using, #name <input (click)="updateName(name.value)">
 
-      - Custom Directives
-          - Custom directives can be applied to components as attributes/classes/events/structural directives. 
-          - They provide custom features that we can use inside of a component to modify behavior, style and structure etc
-          - Use case is to make re-usable custom directives class, attribute and events that can then be applied throughout to app by adding to components
-          - Custom Directives stored in 'directives folder'
-          - Examples, see links 
+      - Custom Directives:
+          - As well as Angular built in directives (ngStyle, ngClass, ngFor, ngIf) we can create Custom Directives that can be applied to components to provide the component with some functionally can be re-sued over several components. This saves us from writing the functionally in every component as the directive is re-usable. We can just create the logic in a directive file and pass it into a component. For example we could have a fade-in fade-out custom directive. The functionally of this directive would be created inside a fadeOut.directive.ts file and this could then be placed into any component by adding the name of the directive inside the component declaration i.e <app-some-component fadeOut> were fadeOut is the custom directive. In the case of DTO we have a appMapWrapper directive & Toms draggable-slide directive used for Showcases. 
+
+          - We can create several Custom Directives such as Attribute or Structural Directives which gives us some re-usable functionality that we can use throughout any component we wish.
+
+          - Custom Directives provide custom features that we can use inside of a component to modify behavior, style and structure etc.
+
+          - Use case is to make re-usable custom directives class, attribute, structural and events that can then be applied throughout to app by adding to components.
+
+          - With Custom Attribute Directives @HostListener is used to interact with native DOM Events on elements - i.e mouseover / mouseleave / (use case - create custom events).
+
+          - With Custom Structural Directives private templateRef: TemplateRef<any> & private viewContainer: ViewContainerRef which need to be used in the constructor as TemplateRef helps you get to the <ng-template> contents and ViewContainerRef accesses the view container. We must use <ng-template *customStructuralDirective> with the custom structural directive the * directive for this to work. More info on this in examples below.
+
+          - Custom Directives can be created with the CLI using 'ng generate directive fadOut' & 'stored in 'directives folder'.
+
+          - Custom Directives Learning Resource:
+            - Angular Docs - https://angular.io/guide/attribute-directives
+            - Angular Docs - https://angular.io/guide/structural-directives
+            - Angular Guide - https://angular-training-guide.rangle.io/advanced-angular/directives/creating_an_attribute_directive
+            - Angular Guide - https://angular-training-guide.rangle.io/advanced-angular/directives/creating_a_structural_directive
+            - Decoded Frontend Video - https://www.youtube.com/watch?v=07CaGlbMPbw&list=PLX7eV3JL9sfmuWwKB2zP_1w7NhLVN10d7&index=1
+
+          - Custom 'Attribute Directives' can be be used to pass values such as css classes to a element within a component that that directive is applied to. Import ElementRef from @angular/core. ElementRef grants direct access to the host DOM element through its nativeElement property. Add ElementRef in the directive's constructor() to inject a reference to the host DOM element, the element to which you apply appHighlight. Then add logic to the HighlightDirective class that sets the background to yellow. In the below example Angular creates an instance of the HighlightDirective class and injects a reference to the <p> element into the directive's constructor, which sets the <p> element's background style to yellow.
+            
+            - Example (Custom Directive using attribute and ElementRef):
+              > highlight.directive.ts
+              import { Directive, ElementRef } from '@angular/core';
+
+              @Directive({
+                selector: '[appHighlight]'
+              })
+              export class HighlightDirective {
+                  constructor(private el: ElementRef) {
+                    this.el.nativeElement.style.backgroundColor = 'yellow';
+                  }
+              }
+
+              > app.component.html
+              <p appHighlight>Highlight me!</p>
+
+          
+          - Custom 'Attribute Directives' can also set values based upon user events such as click, onMouseLeave, onMouseEnter. We can for example  detect when a user mouses into or out of the element and to respond by setting or clearing the highlight color. First we need to import Import HostListener from '@angular/core'. Add two event handlers that respond when the mouse enters or leaves, each with the @HostListener() decorator. Then we can subscribe to events of the DOM element that hosts an attribute directive, the <p> in this case, with the @HostListener() decorator. @HostListener is used to interact with native DOM Events on elements - i.e mouseover / mouseleave / (use case - create custom events). The example below shows how a background color appears when the pointer hovers over the paragraph element and disappears as the pointer moves out.
+            
+            - Example Custom Structural Directives (Custom Directive using user events & HostListener):
+              > highlight.directive.ts
+              import { Directive, ElementRef, HostListener } from '@angular/core';
+
+              @Directive({
+                selector: '[appHighlight]'
+              })
+              export class HighlightDirective {
+
+                constructor(private el: ElementRef) { }
+
+                @HostListener('mouseenter') onMouseEnter() {
+                  this.highlight('yellow');
+                }
+
+                @HostListener('mouseleave') onMouseLeave() {
+                  this.highlight('');
+                }
+
+                private highlight(color: string) {
+                  this.el.nativeElement.style.backgroundColor = color;
+                }
+
+              }
+
+              > app.component.html
+              <p appHighlight>Highlight me!</p>
+
+          - Custom Attribute Directives we can pass values into the custom attribute directive. We will use the above example of setting the highligh color while applying the HighlightDirective. First we import Input from @angular/core. We then add the appHighlight @Input() property in the directive. The @Input() decorator adds metadata to the class that makes the directive's appHighlight property available for binding. In the app.component.ts file we add a color property to the AppComponent (color:string = 'yellow';). To simultaneously apply the directive and the color, use property binding with the appHighlight directive selector, setting it equal to color. This is much like what we are doing in DTO with map-wrapper. 
+
+               - Example (pass values into the custom attribute directive):
+               > highlight.directive.ts
+               @Input() appHighlight = '';
+
+               > app.component.ts
+               export class AppComponent {
+                color:string = 'yellow';
+              }
+              
+              > app.component.html 
+              <p [appHighlight]="color">Highlight me!</p>
+
+          - Custom 'Structural Directives' are directives which change the DOM layout by adding and removing DOM element. If we would like a re-usable structural directive this is were creating a custom structural directive is useful. For example we have a Custom 'Structural Directives' where we could show/hide html elements based on some value being true/false. 
+
+          - With Custom Structural Directives we use private templateRef: TemplateRef<any> &private viewContainer: ViewContainerRef need to be used in the constructor as TemplateRef helps you get to the <ng-template> contents and ViewContainerRef accesses the view container. We must use <ng-template *customStructuralDirective> with the custom structural directive the * directive for this to work. We also use the @Input decorator in the directive to pass some value such a true/false that will communicate to the two components. more view
+
+          - To change the DOM layout when using Custom Structural Directives we must use TemplateRef & ViewContainerRef in our structural directive. 'TemplateRef' represents an embedded template that can be used to instantiate embedded views. 'ViewContainerRef' represents a container where one or more views can be attached. We must instantiate them using dependency Injection in the custom directive. To add a host element to the DOM we need to call 'createEmbeddedView()' which is a method of viewContainerRef. We can then clear a view container using 'clear()' which is a method of ViewContainerRef. See example below.
+
+          - Example Custom Structural Directive: 
+            **ngx-unless.directive.ts file
+            import { Directive, EmbeddedViewRef, TemplateRef, ViewContainerRef, Input } from '@angular/core';
+
+            @Directive({
+              selector: '[ngxUnless]'
+            })
+            export class NgxUnlessDirective {
+
+              visible = false;
+
+              > Inject custom directive templateRef & ViewContainerRef
+              constructor(
+                private templateRef: TemplateRef<any>,
+                private viewContainer: ViewContainerRef
+              ) { }
+
+               > If condition false, instantiate template using EmbeddedViewRef & templateRef, else remove ng-template from the UI. Visible conditional used if visible flag is set to false (use case: if already rendered to UI stop it duplicating ng-template).
+
+              @Input()
+              set ngxUnless(condition: boolean) {
+                if(!condition && !this.visible) {
+                  this.viewContainer.createEmbeddedView(this.templateRef);
+                  this.visible = true;
+                }
+                else if(condition && this.visible) {;
+                  this.viewContainer.clear()
+                  this.visible = false;
+                }
+              }
+
+            }
+            
+            > app.component.html
+            <ng-template>
+              <course-image 
+                [src]="course.iconUrl" 
+                *ngxUnless="!course.iconUrl">
+              </course-image>
+            <ng-template>
+
+          - Examples, see links:  
               - https://github.com/clarkenewsh/angular-core-deep-dive-2-directives/blob/main/src/app/app.component.html
               - https://github.com/clarkenewsh/angular-core-deep-dive-2-directives/blob/main/src/app/directives/highlighted.directive.ts
               - https://github.com/clarkenewsh/angular-core-deep-dive-2-directives/blob/main/src/app/directives/ngx-unless.directive.ts
 
           - @HostBinding can be used to apply directive to DOM elements. Apply highlighted directive to className DOM property using @HostBinding (must be a known DOM property)
+
           - Apply to DOM attr directly instead of DOM Property
+
           - @HostListener is used to interact with native DOM Events on elements - i.e mouseover / mouseleave / (use case - create custom events)
-              - Can also used to emit custom using '$event' .
 
-              - EXAMPLE;
-              ** app.component.html
-              Custom structural directive - *ngxUnless (does the opposite to *ngIf) if the value is falsey 
-               Custom structural directives can be implemented as below 
-              <ng-template [ngIf]="courses[0]" let-course>
-                <div class="courses salmon-theme">
+          - Can also used to emit custom using '$event' .
 
-                  Custom attribute directive created 'highlighted' and applied as host element to the course-card component -->
-                  <!-- Custom event directives can also be created (toggleHighlighted)="onToggle($event)-->
-                  <!-- Can export a custom directive using template variable and #highlighter="hl" and assign it the expression as hl (exportAs: 'hl' saved in directives.ts file). Can then be used as so <div class="course-description" (dblclick)="highlighter.toggle()">  -->
-                  <!-- Custom structural directive - *ngxUnless (does the opposite to *ngIf) if the value is falsey 
+            - EXAMPLE Custom Attribute Directive (Udemy Course):
+            ** app.component.html
+            Custom structural directive - *ngxUnless (does the opposite to *ngIf) if the value is falsey 
+              Custom structural directives can be implemented as below 
+            <ng-template [ngIf]="courses[0]" let-course>
+              <div class="courses salmon-theme">
 
-                  <course-card highlighted #highlighter="hl"
-                    (toggleHighlight)="onToggle($event)"
-                    (courseSelected)="onCourseSelected($event)"
-                    [course]="course">
-                    
-                    
-                    *ngx-unless used as a custom structural directive to always show the course image, unless the iconUrl property is falsey (logic in the ngx-unless structural directive file)
-                    <course-image 
-                      [src]="course.iconUrl" 
-                      *ngxUnless="!course.iconUrl">
-                    </course-image>
+              Custom attribute directive created 'highlighted' and applied as host element to the course-card component -->
+              <!-- Custom event directives can also be created (toggleHighlighted)="onToggle($event)-->
+              <!-- Can export a custom directive using template variable and #highlighter="hl" and assign it the expression as hl (exportAs: 'hl' saved in directives.ts file). Can then be used as so <div class="course-description" (dblclick)="highlighter.toggle()">  -->
+              <!-- Custom structural directive - *ngxUnless (does the opposite to *ngIf) if the value is falsey 
 
-                    <div class="course-description" 
-                      (dblclick)="highlighter.toggle()">
-                      {{ course.longDescription }}
-                    </div>
+              <course-card highlighted #highlighter="hl"
+                (toggleHighlight)="onToggle($event)"
+                (courseSelected)="onCourseSelected($event)"
+                [course]="course">
+                
+                > *ngx-unless used as a custom structural directive to always show the course image, unless the iconUrl property is falsey (logic in the ngx-unless structural directive file)
+                <course-image 
+                  [src]="course.iconUrl" 
+                  *ngxUnless="!course.iconUrl">
+                </course-image>
 
-                  </course-card>
+                <div class="course-description" 
+                  (dblclick)="highlighter.toggle()">
+                  {{ course.longDescription }}
+                </div>
 
-              </div>
-              </ng-template>
+              </course-card>
 
+          </div>
+          </ng-template>
 
-
-              ** highlighted.directive.ts file
-              @Input('highlighted')
-              isHighLighted = false;
+            ** highlighted.directive.ts file
+            @Input('highlighted')
+            isHighLighted = false;
 
             **@HostListener is used to interact with native DOM Events i.e mouseover / mouseleave (can also use $event to emit the event)
               @Output()
@@ -392,51 +520,11 @@
               this.toggleHighlight.emit(this.isHighLighted);
             } 
 
-
-
-          - Custom structural directives
-                  -*ngxUnless (does the opposite to *ngIf) if the value is falsey
-                  - '*ngx' means custom directive unlike the usual *ng approach
-
-            Example: 
-            **ngx-unless.directive.ts file
-            import { Directive, EmbeddedViewRef, TemplateRef, ViewContainerRef, Input } from '@angular/core';
-
-            @Directive({
-              selector: '[ngxUnless]'
-            })
-            export class NgxUnlessDirective {
-
-              visible = false;
-
-              // Inject custom directive template
-              constructor(
-                private templateRef: TemplateRef<any>,
-                private viewContainer: ViewContainerRef
-              ) { }
-
-              //  If condition false, instantiate template using EmbeddedViewRef & template 
-                  // else remove ng-template from the ui
-                    // visible conditional used if visible flag is set to false (use case: if already rendered to ui stop it duplicating ng-template)
-              @Input()
-              set ngxUnless(condition: boolean) {
-                if(!condition && !this.visible) {
-                  this.viewContainer.createEmbeddedView(this.templateRef);
-                  this.visible = true;
-                }
-                else if(condition && this.visible) {;
-                  this.viewContainer.clear()
-                  this.visible = false;
-                }
-              }
-
-            }
-
-      - View encapsulation concept is what happens under the hood when we have a css file scoped to an individual component   
-          - :host can be used to app style the the host component 
-          - ::ng-deep used to bypass view encapsulation (use case is to style elements within a component that have used content projection)
-          - :host-context Modifier 
-          - Bypass the feature encapsulation using: ViewEncapsulation.None 
+  - View Encapsulation: concept is what happens under the hood when we have a css file scoped to an individual component   
+      - :host can be used to app style the the host component 
+      - ::ng-deep used to bypass view encapsulation (use case is to style elements within a component that have used content projection)
+      - :host-context Modifier 
+      - Bypass the feature encapsulation using: ViewEncapsulation.None 
 
   3 - HTTP Client
       - HttpClient service 
@@ -699,7 +787,7 @@
         
             Edit Title: <input #courseTitle [value]="course.description" (keyup)="onTitleChanged(courseTitle.value)">
           
-            // Change course title on keyup event
+            > Change course title on keyup event
             onTitleChanged(newTitle: string) {
               this.course.description = newTitle;
             }
@@ -779,7 +867,7 @@
           
           - OnPush change detection will only work with Observable data when using the async pipe. Not using the manual subscribe solution.
 
-          - Oservables & OnpUsh: by using the async pipe with observables OnPush Change Detection works just fine when the observables emits a new value. If we subscribed manually in ngOnInit for example nPush would not work. Using async and OnPush is a great solution especially when the application is built in a reactive style with lots of observable data. So if we remember to subscribe to any observables as much as possible using the async pipe at the level of the template, we get a couple of advantages: we will run into much less change detection issue using OnPush.
+          - Observables & OnPush: by using the async pipe with observables OnPush Change Detection works just fine when the observables emits a new value. If we subscribed manually in ngOnInit for example nPush would not work. Using async and OnPush is a great solution especially when the application is built in a reactive style with lots of observable data. So if we remember to subscribe to any observables as much as possible using the async pipe at the level of the template, we get a couple of advantages: we will run into much less change detection issue using OnPush.
           We will make it much easier to switch from the default change detection strategy to OnPush later if we need to.
           Immutable data and @Input() reference comparison is not the only way to achieve a high performant UI with OnPush: the reactive approach is also an option to use OnPush effectively
 
@@ -791,6 +879,12 @@
           - If Angular handles an event within a component without OnPush strategy, the framework executes change detection on the entire component tree. Angular will skip descendant component subtrees with roots using OnPush, which have not received new inputs.
 
           - Attribute Decorator can be used when we have lots of inputs passed in to a component that will not require a change in data. So when having lots of @Input() property and we are sure than that data will not change over time we can use the @Attribute('type') private type: string in the constructor. Its great for performance optimization because when Angular runs through the change detection cycle if using the @Attribute decorator it will not check for changes on the @Input property.
+
+          - Custom Change Detection can be implemented to tell angular to looks for changes in particular component when using OnPush change detection if we have not updated the @Input properties with by using the spread operator or when using observables without using the async pipe. Custom change detection is not best practice and should be used only when manually requesting changes frequently, that are expensive - i.e every 2seconds when dealing with lots of data continually.
+          
+          - Custom Change Detection is Implemented in constructor as private cd: ChangeDetectorRef. We then use ngDoCheck() lifecycle hook and inside this hook we check for changes using this.cd.markForCheck();
+          
+          -  Best way to implement custom change detection is by putting the checking logic in the ngDoCheck() lifecycle hook.
 
           - **IMPORTANT LINK** - See the below link to see how Angular skips component subtrees (parent, child, ancestors) when using default & OnPush Change Detection when mutating data with new data inputs & event handlers 
               - Angular Docs - https://angular.io/guide/change-detection-skipping-subtrees
@@ -973,14 +1067,16 @@
           </div>
 
 
-        - Custom Change Detection can be implemented to tell angular to looks for changes in particular component (not best practice and should be used only when manually requesting changes i.e every 2seconds when dealing with lots of data continually)
-          - Implemented in constructor and ngOnInit, data subscribe function as below
-          - Best way to implement is with the DoCheck & ngDoCheck() lifecycle hook as per below;
+        - Custom Change Detection can be implemented to tell angular to looks for changes in particular component when using OnPush change detection if we have not updated the @Input properties with by using the spread operator or when using observables without using the async pipe. Custom change detection is not best practice and should be used only when manually requesting changes frequently, that are expensive - i.e every 2seconds when dealing with lots of data continually.
+          
+        - Custom Change Detection is Implemented in constructor as private cd: ChangeDetectorRef. We then use ngDoCheck() lifecycle hook and inside this hook we check for changes using this.cd.markForCheck();
+        
+        - Best way to implement custom change detection is by putting the checking logic in the DoCheck & ngDoCheck() lifecycle hook below:
 
           courses = Course[];
           loaded:boolean = false;
 
-          constructor(private cd: ChangeDetection){
+          constructor(private cd: ChangeDetectorRef){
           }
 
           ngDoCheck() {
