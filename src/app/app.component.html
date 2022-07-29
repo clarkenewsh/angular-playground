@@ -867,6 +867,8 @@
 
           - Although allowing for better performance, the use of OnPush comes at a high complexity cost if used with mutable objects. It might introduce bugs that are hard to reason about and reproduce. But there is a way to make the use of OnPush viable.
 
+          - An Angular app implemented in a reactive style is much easier to refactor to use OnPush Change Detection - See Reactive Angular course, Section 6 for a video how this work. 
+
           - In Summary OnPush change detection: this works by detecting if some new data has been explicitly pushed into the component, either via a component input or an Observable subscribed to using the async pipe
 
           - We implement OnPush Change Detection in @Component Decorator as below;
@@ -878,7 +880,7 @@
               })
               export class MyComponent {}
           
-          - OnPush change detection will only work with Observable data when using the async pipe. Not using the manual subscribe solution.
+          - OnPush change detection will only work with Observable data when using the async pipe. Not using the manual subscribe solution. 
 
           - Observables & OnPush: by using the async pipe with observables OnPush Change Detection works just fine when the observables emits a new value. If we subscribed manually in ngOnInit for example nPush would not work. Using async and OnPush is a great solution especially when the application is built in a reactive style with lots of observable data. So if we remember to subscribe to any observables as much as possible using the async pipe at the level of the template, we get a couple of advantages: we will run into much less change detection issue using OnPush.
           We will make it much easier to switch from the default change detection strategy to OnPush later if we need to.
