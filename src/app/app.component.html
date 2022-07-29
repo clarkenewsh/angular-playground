@@ -9,16 +9,29 @@
         - Reactive Form Validation: someForm = new FormGroup({ name: new FormControl this.nameInput, Validators.required, Validation.minLength(4)}). Validation message like this: <div *ngIf="name.invalid && name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
       - (keyup) change detection concept can also be used to actively track changes to the data model and re-render the view up change
       - See reactive forms component in this project to see how to best implement a Reactive Form
-      - Angular 14 new feature 'Typed Form' which apples TS types to Reactive Forms (https://blog.angular-university.io/angular-typed-forms/)
+      - Angular 14 new feature 'Typed Form' which apples TS types to Reactive Forms (https://blog.angular-university.io/angular-typed-forms/) 
+
+      ** see reactive-forms component in this project to see best implementation of formGroup & form builder using validators 
+      
+      ** See best implementation of formGroup & form builder using validators in Reactive Angular repo. Also using formGroup & form builder & validators - https://github.com/clarkenewsh/reactive-angular-with-rxjs/blob/main/reactiveAngularCourseNotes.md
+
+      Additional Learning Resource:
+      - Angular Docs - https://angular.io/guide/reactive-forms
       - Angular Uni Blog Resource - https://blog.angular-university.io/tag/angular-forms/
 
   2 - Components / core directives
       - Angular Uni Blog Resource - https://blog.angular-university.io/tag/angular-core/
+      - Angular docs - https://angular.io/guide/inputs-outputs & https://angular.io/guide/component-interaction
+
       - Text Interpolation from class properties values
+
       - Parent/Child components:
-        - @Input for data binding from parent to child component - define property in parent in, pass in to component declaration with attribute binding [course]=[course] and @Input inside child component ts file (use the interface type to declare in child component to make type safe) i.e @Input course: Course;
-        - @Output new EventEmitter for event binding/emitting
+        - [course]="course" placed in the component declaration & @Input in the child component for data binding from parent to child component - define property in parent in, pass in to component declaration with attribute binding [course]=[course] and @Input inside child component ts file (use the interface type to declare in child component to make type safe) i.e @Input course: Course;
+
+        - @Output new EventEmitter for event binding/emitting - child back up to parent
+
         - Native click events can be bubbled up from child to parent without using @Output, just need (click) in the component declaration
+
         - Custom events will need the @Output EventEmitter to bubble up -  define method in the parent component, name the event in the @Output in the child component ts file with typescript defined what it getting outputted, $event can be caught in the component declaration and then caught in the parent component as params as we used the $event & EventMiter
             
         - Example of custom events:
