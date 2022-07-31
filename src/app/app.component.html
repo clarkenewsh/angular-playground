@@ -78,6 +78,7 @@
         - *ngIf can be used with an else 'else' can be used to display an error message were else is a ng-template with template variable using #templateVariableName as the else clause.
         - With ngIf, if an element is hidden then that element does not exist at all in the page. Unlike using css to hide an element but is still loaded in to the DOM.
         - *ngFor allows us to build data presentation lists and tables in our HTML templates.
+        - *ngFor is also how we loop through data (i.e course data) and then pass that data into a child component (i.e courseCard.component). This will create  anew course card for each course object looked through using *ngFor (as seen below)
         - Consuming Observable data with ngIf & the async pipe: Using *ngFor in a reactive pattern with Observable data we can use - <div *ngIf=”(currentOpenMenu$ | async) as currentOpenMenu””> observable which we can then use in the template {{currentOpenMenu}}. By using 'as' we set a variable that takes on the values of the currentOpenMenu$ observable and we then use this local as variable in the template. 
 
           Example Consuming Observable data with ngIf & the async pipe:
