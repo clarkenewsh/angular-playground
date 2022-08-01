@@ -69,7 +69,8 @@
           <button (click)="onCourseViewed()">View Course</button>
 
       - Structural Directives 
-        - *ngFor, *ngIf, ngContainer (used when we need a div to conditionally render html structure), *ngSwitchCase elvis operator?
+        - *ngFor, *ngIf, ngContainer (used when we need a div to conditionally render html structure), *ngSwitchCase 
+        - elvis operator? placed after template expression will ensure that if that property from the object is not available the rest of the objects properties will still be rendered and the entire section of the component will not break. So basically the the ? will bypass any missing or broken object properties without the component throwing an error, breaking or not rendering.
         - ng-container (this is how angular works under the hood when using *ngIf/*ngFor)
         - ng-container can be used instead of a div to apply conditional structural rendering (dont apply a div just to apply conditional rendering. ng-container should be used in this situation)
         - ng-container can also be used when using the async pipe to subscribe top Observables instead dof creating a extra div element to house the async pipe
@@ -79,9 +80,12 @@
         - With ngIf, if an element is hidden then that element does not exist at all in the page. Unlike using css to hide an element but is still loaded in to the DOM.
         - *ngFor allows us to build data presentation lists and tables in our HTML templates.
         - *ngFor is also how we loop through data (i.e course data) and then pass that data into a child component (i.e courseCard.component). This will create  anew course card for each course object looked through using *ngFor (as seen below)
+
         - Consuming Observable data with ngIf & the async pipe: Using *ngFor in a reactive pattern with Observable data we can use - <div *ngIf=”(currentOpenMenu$ | async) as currentOpenMenu””> observable which we can then use in the template {{currentOpenMenu}}. By using 'as' we set a variable that takes on the values of the currentOpenMenu$ observable and we then use this local as variable in the template. 
 
-          Example Consuming Observable data with ngIf & the async pipe:
+        - Consuming Observable data with *ngFor & the async pipe: We can also use *ngFor with Observable data to output a list of observable variable data i.e beginnerCourses$: Observable<Course[]> and in the template we use <li *ngFor="let course of (beginnerCourses$ | async)">
+
+          - Example Consuming Observable data with ngIf & the async pipe:
           
           <ng-container *ngIf="(courses$ | async) as courses">
               <div class="courses">
@@ -89,10 +93,119 @@
               </div> 
           </ng-container>
 
-        - index as i to index each item in the ngFor loop
+          
+          - Example of consuming Observable data with ngIf with the async pipe and then ngFor to output that data into a child component:
+
+          > app.component.ts
+          beginnerCourses$: Observable<Course[]> 
+          
+          ngOnInit() {
+            courses$ = this.coursesService.loadAllCourses();
+
+            this.beginnerCourses$ = courses$
+              .pipe(
+                map(courses => courses.filter(course => course.category == 'BEGINNER'))
+              );
+          }
+        
+          > app.component.html
+          <div class="courses" *ngIf="courses$ | async as courses">
+              <course-card *ngFor="let course of courses"
+                          [course]="course">
+
+                <course-image [src]="course.iconUrl"></course-image>
+
+              </course-card>
+
+          </div> 
+
+        
+        - Example of consuming Observable data with smart vs presentational components component:
+
+        ** coursesCardListComponent.ts
+        export class CoursesCardListComponent implements OnInit {
+            @Input()
+            courses: Course[];  
+
+            constructor(private dialog: MatDialog) {
+
+            }
+
+            ngOnInit() {
+
+            }
+          }
+
+          **coursesCardListComponent.html
+          <mat-card *ngFor="let course of courses" class="course-card mat-elevation-z10">
+
+              <mat-card-header>
+
+                  <mat-card-title>{{course.description}}</mat-card-title>
+
+              </mat-card-header>
+
+              <img mat-card-image [src]="course.iconUrl">
+
+              <mat-card-content>
+                  <p>{{course.longDescription}}</p>
+              </mat-card-content>
+
+              <mat-card-actions class="course-actions">
+
+              <button mat-button class="mat-raised-button mat-primary" [routerLink]="['/courses', course.id]">
+                  VIEW COURSE
+              </button>
+
+              <button mat-button class="mat-raised-button mat-accent"
+                      (click)="editCourse(course)">
+                  EDIT
+              </button>
+
+              </mat-card-actions>
+
+          </mat-card>
+
+          ** Home.Component.html
+          
+          <div class="courses-panel">
+
+              <h3>All Courses</h3>
+
+              <mat-tab-group>
+
+                  <mat-tab label="Beginners">
+
+                      <courses-card-list [courses]="beginnerCourses$ | async"></courses-card-list>
+
+                  </mat-tab>
+
+                  <mat-tab label="Advanced">
+
+                      <courses-card-list [courses]="advancedCourses$ | async"></courses-card-list>
+                
+                  </mat-tab>
+
+              </mat-tab-group>
+
+          </div>
+
+          ** home.component.ts
+          beginnerCourses$: Observable<Course[]> 
+          
+          ngOnInit() {
+            courses$ = this.coursesService.loadAllCourses();
+
+            this.beginnerCourses$ = courses$
+              .pipe(
+                map(courses => courses.filter(course => course.category == 'BEGINNER'))
+              );
+          }
+
+        - index can be as as i to index each item in the ngFor loop.
         - first & last can be used with ngFor to get the first and last index of the for loop. We can then target them and use for styling for example.
-          - first as isFirst; 
-          - last as isLast;
+        - first in the array of data can be accessed with  as isFirst; 
+        - last in the array of data can be accessed with last as isLast;
         - ng-template to show error messages or replace course image, conditional html structure,
         - Angular Uni Blog Resource
           - https://blog.angular-university.io/angular-ngif/
@@ -137,7 +250,7 @@
       - Angular Uni Blog Resource - ngContent,ngContainer,ngTemplate, ngTemplateOutlet 
         - https://blog.angular-university.io/angular-ng-template-ng-container-ngtemplateoutlet/
 
-      - Attribute, Class & Style directives for dynamic styling ([src], [title], [course], ngModel, ngClass, ngStyle, ngSwitch). 
+      - Attribute, Class & Style directives for dynamic styling ([src], [title], [course], ngModel, ngClass, ngStyle, ngSwitch).
       - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (best practice & keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
       - Conditional style classes using [ngClass]
       - We can even apply a class to a html element if a member variables is true or false using [class.btn-primary] that is activating the btn-primary CSS class, effectively adding it to the button.
@@ -886,6 +999,8 @@
           - Observables & OnPush: by using the async pipe with observables OnPush Change Detection works just fine when the observables emits a new value. If we subscribed manually in ngOnInit for example nPush would not work. Using async and OnPush is a great solution especially when the application is built in a reactive style with lots of observable data. So if we remember to subscribe to any observables as much as possible using the async pipe at the level of the template, we get a couple of advantages: we will run into much less change detection issue using OnPush.
           We will make it much easier to switch from the default change detection strategy to OnPush later if we need to.
           Immutable data and @Input() reference comparison is not the only way to achieve a high performant UI with OnPush: the reactive approach is also an option to use OnPush effectively
+
+          - Observables & OnPush: using reactive design with observables and async can help to implement OnPush much easier and ensures that it works correctly - with observables & the async pipe, change detection is automatically run when the observable emits new data so with this approach so OnPush works great as the component with OnPush applied is removed from the component tree so angular does not check it when some other data changes in the component tree (this helps performance). If we were not using observable data and using @Inputs instead the @Input data can  ot be mutated and therefore a new object would have to be created for OnPush to detect a change in the input data. This is were you would use spread operator for instance. 
 
           - OnPush is a good option when handling a lot of data as it is better for performance s it does not check every component and view in the component tree, comparing previous and new values to detect if the data has changed.
 
