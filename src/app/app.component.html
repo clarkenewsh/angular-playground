@@ -1002,12 +1002,15 @@
 
           - Observables & OnPush: using reactive design with observables and async can help to implement OnPush much easier and ensures that it works correctly - with observables & the async pipe, change detection is automatically run when the observable emits new data so with this approach so OnPush works great as the component with OnPush applied is removed from the component tree so angular does not check it when some other data changes in the component tree (this helps performance). If we were not using observable data and using @Inputs instead the @Input data can  ot be mutated and therefore a new object would have to be created for OnPush to detect a change in the input data. This is were you would use spread operator for instance. 
 
+          - Observables & OnPush: We can also create deeply nested smart components to avoid custom event bubbling. This also helps with onPush - Bubbling events manually several levels up the component tree is really inconvenient and is a likely sign that the component design needs to be revisited. Let's then re-implement the newsletter component as a deeply nested smart component: this can be done like below. This is an example of how sometimes its better to inject services deeply in the component tree instead of passing data and bubbling events up and down the component tree, and the dependency injection system makes it really practical to do that.
+
+          
           - OnPush is a good option when handling a lot of data as it is better for performance s it does not check every component and view in the component tree, comparing previous and new values to detect if the data has changed.
 
           - How we can enforce OnPush Change Detection by enforcing Immutability: 
             - OnPush change detection can not mutate the data directly in the view (much like state on react). We must create a copy using the spread operator. This is then detected by OnPush Change Detection and the new copy of data with value changes will be updated. By utilizing Object Spread Operator, which is a fantastic way to ensure object immutability in our projects. It's important to, as often as possible, avoid any direct object property manipulation - as doing so can cause many issues when it comes to any of Angular's internal comparison by reference checks. For a high quality reactive application, immutability is key. Using this pattern we are taking full advantage of the "OnPush" change detection strategy and thus reducing the amount of work done by Angular to propagate changes and to get models and views in sync. This improves the performance of the application. Link to resource - https://angular-training-guide.rangle.io/change-detection/enforcing_immutability
 
-          - If Angular handles an event within a component without OnPush strategy, the framework executes change detection on the entire component tree. Angular will skip descendant component subtrees with roots using OnPush, which have not received new inputs.
+          - If Angular handles an event within a component without OnPush strategy, the framework executes change detection on the entire component tree. Angular will skip descendant component subtrees with roots using OnPush, which have not received new inputs. Triggering of event handlers inside the component itself also causes the on push change detector to trigger, independently than if the inputs have changed or not - this means that if any components have click handlers, refactoring to OnPush will be much easier as the click handlers invoke change detection.
 
           - Attribute Decorator can be used when we have lots of inputs passed in to a component that will not require a change in data. So when having lots of @Input() property and we are sure than that data will not change over time we can use the @Attribute('type') private type: string in the constructor. Its great for performance optimization because when Angular runs through the change detection cycle if using the @Attribute decorator it will not check for changes on the @Input property.
 
@@ -1196,6 +1199,14 @@
 
             </course-card>
           </div>
+
+        - Example of implementing OnPush Change Detection in a deeply nested smart component (this also provides benefits to bubbling up custom events to the parent smart component):
+
+        @Component({
+          selector: 'newsletter',
+          changeDetection: ChangeDetectionStrategy.OnPush,
+          template: `
+          <fieldset class="newsletter" *ngIf="userService.user$ | async as user else loading">  << access the service in the deeply nested smart component with the async pipe
 
 
         - Custom Change Detection can be implemented to tell angular to looks for changes in particular component when using OnPush change detection if we have not updated the @Input properties with by using the spread operator or when using observables without using the async pipe. Custom change detection is not best practice and should be used only when manually requesting changes frequently, that are expensive - i.e every 2seconds when dealing with lots of data continually.
