@@ -19,20 +19,25 @@
       - Angular Docs - https://angular.io/guide/reactive-forms
       - Angular Uni Blog Resource - https://blog.angular-university.io/tag/angular-forms/
 
-  2 - Components / core directives
+
+  2 - Components / core directives / structural directives / attribute, class & style directives / property bindings
+
       - Angular Uni Blog Resource - https://blog.angular-university.io/tag/angular-core/
       - Angular docs - https://angular.io/guide/inputs-outputs & https://angular.io/guide/component-interaction
 
       - Text Interpolation from class properties values
 
-      - Parent/Child components:
+      - Parent/Child components / property binding / shareing data between parent/child components:
+
         - [course]="course" placed in the component declaration & @Input in the child component for data binding from parent to child component - define property in parent in, pass in to component declaration with attribute binding [course]=[course] and @Input inside child component ts file (use the interface type to declare in child component to make type safe) i.e @Input course: Course;
+
+        - Property bindings from parent to child can be listened to in the child using @Input & the ngOnChanges lifecycle hook
 
         - @Output new EventEmitter for event binding/emitting - child back up to parent
 
         - Native click events can be bubbled up from child to parent without using @Output, just need (click) in the component declaration
 
-        - Custom events will need the @Output EventEmitter to bubble up -  define method in the parent component, name the event in the @Output in the child component ts file with typescript defined what it getting outputted, $event can be caught in the component declaration and then caught in the parent component as params as we used the $event & EventMiter
+        - Custom events will need the @Output EventEmitter to bubble up to parent component -  define method in the parent component, name the event in the @Output in the child component ts file with typescript defined what it getting outputted, $event can be caught in the component declaration and then caught in the parent component as params as we used the $event & EventMiter
             
         - Example of custom events:
 
