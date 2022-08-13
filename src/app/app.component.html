@@ -34,7 +34,7 @@
 
       - Parent/Child components / property binding / sharing data between parent/child components:
 
-        - [course]="course" placed in the component declaration & @Input in the child component for data binding from parent to child component - define property in parent in, pass in to component declaration with attribute binding [course]=[course] and @Input inside child component ts file (use the interface type to declare in child component to make type safe) i.e @Input course: Course;
+        - <child-comp [courseToChild]="course" /> placed in the component declaration using course as the parent property & @Input in the child component for data binding from parent to child component - define property in parent in, pass in to component declaration with attribute binding [course]=[course] and @Input inside child component ts file (use the interface type to declare in child component to make type safe) i.e @Input courseToChild: Course; <h1>{{courseToChild}}</h1>
 
         - Property bindings from parent to child can be listened to in the child using @Input & the ngOnChanges lifecycle hook
 
