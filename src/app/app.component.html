@@ -32,7 +32,7 @@
 
       - Text Interpolation from class properties values
 
-      - Parent/Child components / property binding / shareing data between parent/child components:
+      - Parent/Child components / property binding / sharing data between parent/child components:
 
         - [course]="course" placed in the component declaration & @Input in the child component for data binding from parent to child component - define property in parent in, pass in to component declaration with attribute binding [course]=[course] and @Input inside child component ts file (use the interface type to declare in child component to make type safe) i.e @Input course: Course;
 
@@ -230,7 +230,8 @@
                 <p class="warn">{{course.description}} has no image is available</p>
               </ng-template>
   
-          - elvis operator? can be used to bypass an undefined object value or object property so that the rest of the course are still displayed
+          - elvis operator? can be used to bypass an undefined object value or object property so that the rest of the course are still displayed.
+
           - *ngSwitch can be used when we want to conditionally render more than two outcomes 
             Example ngSwitch:
             **[ngSwitch] attr & *ngSwitchCase / *ngSwitchDefault structural directive, used to show course level 
@@ -263,7 +264,7 @@
       - Attribute, Class & Style directives for dynamic styling ([src], [title], [course], ngModel, ngClass, ngStyle, ngSwitch).
       - Conditional classes and element styles can also be implemented using a method [ngClass]="cardClasses()" or [ngStyle]="cardStyles()" - (best practice & keeps the view clean) to check the key value pairs of the object are true/false, apply classes based out outcome.
       - Conditional style classes using [ngClass]
-      - We can even apply a class to a html element if a member variables is true or false using [class.btn-primary] that is activating the btn-primary CSS class, effectively adding it to the button.
+      - We can even apply a class dynamically to a html element if a member variables is true or false using [class.btn-primary] that is activating the btn-primary CSS class, effectively adding it to the button.
 
         - Example(using boolean value):
           <button class="btn" 
@@ -273,6 +274,9 @@
 
         - We could also instead of adding true to the expression directly like above, we could use a member variable such is 'isSelected: boolean = false' and when this value is toggled the .btn-primary class could be turned on or of
           - Example (using boolean value from member variable):
+            
+          isSelected: boolean = false;
+
           <button class="btn" 
             [class.btn-primary]="isSelected" 
             type="submit">Button
