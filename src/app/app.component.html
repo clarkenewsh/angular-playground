@@ -1,18 +1,27 @@
 <!-- TASK LIST:
 
   1 - Forms 
-      - Reactive Form to update data ([formGroup]="someForm" <input formControlName="name"> (ngSubmit)="onSubmit() name: new FormControl('')" / name = new FormControl('') [formControl]="name" / FormBuilder) - suitable for larger, complex forms
-      - Template Driven Form to update data model - ([ngModel]) to bind form data to model <form #someForm="ngForm" (ngSubmit)="onSubmit()"- suitable for small forms
+      - Reactive Form (formGroup & FormBuilder): Add notes here on why reactive form using formBuilder is the best approach....
+        - Reactive Form to update data ([formGroup]="someForm" <input formControlName="name"> (ngSubmit)="onSubmit() name: new FormControl('')" / name = new FormControl('') [formControl]="name" / FormBuilder) - suitable for larger, complex forms
+      - Template Driven Form: 
+        - Template Driven Form to update data model - ([ngModel]) to bind form data to model <form #someForm="ngForm" (ngSubmit)="onSubmit()"- suitable for small forms
       - Input, two way data binding (ngModel) - <input ([ngModel])="object.name">
+      - Reactive Form Validation using FormGroup & FormBuilder
+      
       - Form Validation using both reactive & template driven forms, much like html form validation
         - Template Driven Form Validation: (<input required>, <input minlength="2">, <input maxlength="10">, <input pattern="[a-z]+"). Validation message like this: <div *ngIf="name.invalid && (name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
         - Reactive Form Validation: someForm = new FormGroup({ name: new FormControl this.nameInput, Validators.required, Validation.minLength(4)}). Validation message like this: <div *ngIf="name.invalid && name.dirty || name.touched)><div *ngIf="name.errors?.required"><p>Name is required</p></div>"
       - (keyup) change detection concept can also be used to actively track changes to the data model and re-render the view up change
-      - We can get the entire form field values in a object using 'this.formBuilderGroupForm.value' - use this when submitting form values by referencing what ever we called the form.
+
+      - We can get the entire form field values in a object using 'this.formBuilderGroupForm.value' - use this when submitting form values by referencing what ever we called the form. we can then for example save the form.value in a variable (i.e const formChanges = this.form.value)
+
+      - We can reset form values using form builder using the form.reset() method. We would want to do this after submitting the form so we can clear the form fields once the form has been submitted.
+
       - We can use this.formBuilderGroupForm.valid before submitting a form to ensure the form is only submitted when valid
         - if(this.formBuilderGroupForm.valid) {
           ** submit form http post logic here
         }
+
       - See reactive forms component in this project to see how to best implement a Reactive Form
       - Angular 14 new feature 'Typed Form' which apples TS types to Reactive Forms (https://blog.angular-university.io/angular-typed-forms/) 
 
@@ -1523,19 +1532,34 @@
 
         - Concepts to concentrate on
           - Classes
+
           - Enums
+
           - Interfaces
+
           - Primitive Types & type annotations
+
           - Parameter types
+
           - Function return types
+
           - Generic types
+
           - Partials
+
           - Unions
+
           - Object Destructuring 
+
           - Tuples
-          - Getters/setters
+
+          - Getters/setters:
+            - Add notes here from instagram post on getters and setters. Also add the example from DTO were we use get& set with observable subjects, were the get is the asObservable declaration the set is the .next() method with the new value to update the get property value by passing in new value using params into the set method and then use them param values in the .next(paramVal).
+
           - Partials
-          - Private/public 
+
+          - Private/public In Angular Components:
+            - First and foremost, keep in mind that private is only a compile-time construct - it cannot be enforced at runtime (see here and here for relevant discussion): Please dismiss any notions of private being useful in any way for security purposes. That's simply not what it's about. It is about encapsulation, and when you have a field or method on your component that you want to encapsulate in it, making it clear that it shouldn't be accessed from anywhere else, then you should absolutely make it private: That's what private is for: It signals your intent that whatever you've put it on shouldn't be touched from outside the class. The same goes for public: It too is a compile-time-only construct, so the fact that class members are public by default, while true, has exactly zero meaning at runtime. But when you have a member that you explicitly intend to expose to the outside world as a part of your class's API, you should absolutely make it public to signal this intent: That's what public is for. This is all applicable to Typescript in general. In Angular specifically, there are definitely valid use-cases for having public members on component classes: For instance, when implementing the container/component (aka smart/dumb) pattern, with "dumb" children injecting "smart" parents via constructor injection, it's extremely important to communicate your intent about what members on the parent should and should not be touched by the children: Otherwise, don't be surprised when you catch those dumb kids fooling around in their parents' liquor cabinet.
   
   16 - SASS
         - Sass Docs - https://sass-lang.com/guide
